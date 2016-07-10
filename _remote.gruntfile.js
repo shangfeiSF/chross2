@@ -22,9 +22,11 @@ function makeConcat(config) {
   )
 
   Object.keys(json).forEach(function (prop) {
-    result.tasks.push('concat:' + prop)
+    var taskName = prop + 'LibConcat'
 
-    result.concat[prop] = {
+    result.tasks.push('concat:' + taskName)
+
+    result.concat[taskName] = {
       src: json[prop].src.map(function (file) {
         return path.join(config.sourceDir, config.libDir, file)
       }),
