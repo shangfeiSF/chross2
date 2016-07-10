@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+'use strict'
+
+var path = require('path')
+var cp = require('child_process')
+
+var GruntFileName = 'Gruntfile.extension.js'
+var baseCommand = ['grunt', '--gruntfile', GruntFileName]
+var gruntCommands = {
+  build: baseCommand.concat(['build']).join(' '),
+  hostReplace: baseCommand.concat(['hostReplace']).join(' ')
+}
+
+cp.exec(gruntCommands.build, {cwd: process.cwd()}, function (error, stdout, stderr) {
+  if (error) {
+    console.error('exec error:' + error)
+  } else {
+    console.log(stdout)
+    console.log(stderr)
+
+    cp.exec(gruntCommands.hostReplace, {cwd: process.cwd()}, function (error, stdout, stderr) {
+      if (error) {
+        console.error('exec error:' + error)
+      } else {
+        console.log(stdout)
+        console.log(stderr)
+      }
+    })
+  }
+})

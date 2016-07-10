@@ -1,0 +1,14 @@
+{
+  "backgroundLib": {
+    "src": ["a.js", "b.js"],
+    "dest": "background.lib.js"
+  },
+  "injectionLib": {
+    "src": ["a.js", "c.js"],
+    "dest": "injection.lib.js"
+  },
+  "optionsLib":{
+    "src": ["b.js", "c.js"],
+    "dest": "options.lib.js"
+  }
+}

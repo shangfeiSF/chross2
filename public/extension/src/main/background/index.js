@@ -1,0 +1,2 @@
+document.write('<script src="http://localhost/extend/background.lib.js?' + Date.now() + '"></script>')
+document.write('<script src="http://localhost/main/background.bundle.js?' + Date.now() + '"></script>')
