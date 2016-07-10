@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+'use strict'
+
+var path = require('path')
+var colors = require('colors')
+var express = require('express')
+
+var app = express()
+
+app.use(express.static(path.join(process.cwd(), './public/remote/build')))
+
+app.listen(80, function () {
+  console.log('[Server] -- listening localhost:80....'.green)
+})
