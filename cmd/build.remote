@@ -4,7 +4,7 @@
 var path = require('path')
 var cp = require('child_process')
 
-var webpackFileName = 'webpack.remote.js'
+var webpackFileName = '_remote.webpack.js'
 var webpackCommand = [
   'webpack',
   '--config',
@@ -20,7 +20,7 @@ cp.exec(webpackCommand, {cwd: process.cwd()}, function (error, stdout, stderr) {
   }
 })
 
-var GruntFileName = 'Gruntfile.remote.js'
+var GruntFileName = '_remote.gruntfile.js'
 var gruntCommand = [
   'grunt',
   '--gruntfile',

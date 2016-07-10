@@ -4,7 +4,7 @@
 var path = require('path')
 var cp = require('child_process')
 
-var GruntFileName = 'Gruntfile.extension.js'
+var GruntFileName = '_extension.gruntfile.js'
 var baseCommand = ['grunt', '--gruntfile', GruntFileName]
 var gruntCommands = {
   build: baseCommand.concat(['build']).join(' '),
