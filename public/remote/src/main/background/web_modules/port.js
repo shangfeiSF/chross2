@@ -7,24 +7,6 @@ function Port(chross) {
 }
 
 $.extend(Port.prototype, {
-  onConnect: function () {
-    var self = this
-
-    chrome.runtime.onConnect.addListener(function (port) {
-      self.registerPortByTabId(port.sender.tab.id, port)
-
-      self.monitor(port)
-    })
-  },
-
-  onTabRemoved: function () {
-    var self = this
-
-    chrome.tabs.onRemoved.addListener(function (tabId) {
-      self.removePortByTabId(tabId)
-    })
-  },
-
   monitor: function (port) {
     var self = this
 
@@ -33,8 +15,10 @@ $.extend(Port.prototype, {
     port.onMessage.addListener(function (msg) {
     })
 
+    // 页面刷新 & 页面关闭 都会自动触发 port.disconnect()
+    // 页面刷新后触发 onBeforeNavigate 删除该tabId下的port
+    // 页面关闭后触发 onTabRemoved 删除该tabId下的port
     port.onDisconnect.addListener(function (port) {
-      console.log(self.ports)
     })
   },
 
@@ -61,15 +45,46 @@ $.extend(Port.prototype, {
     var port = self.ports[tabId]
 
     if (port) {
-      port.disconnect()
       delete  self.ports[tabId]
     }
   },
 
-  init: function () {
-    this.onConnect()
+  onConnect: function () {
+    var self = this
 
-    this.onTabRemoved()
+    chrome.runtime.onConnect.addListener(function (port) {
+      self.registerPortByTabId(port.sender.tab.id, port)
+
+      self.monitor(port)
+    })
+  },
+
+  onBeforeNavigate: function () {
+    var self = this
+
+    chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
+      if (details.frameId !== 0) return false
+
+      self.removePortByTabId(details.tabId)
+    })
+  },
+
+  onTabRemoved: function () {
+    var self = this
+
+    chrome.tabs.onRemoved.addListener(function (tabId) {
+      self.removePortByTabId(tabId)
+    })
+  },
+
+  init: function () {
+    var self = this
+
+    self.onConnect()
+
+    self.onBeforeNavigate()
+
+    self.onTabRemoved()
   }
 })
 

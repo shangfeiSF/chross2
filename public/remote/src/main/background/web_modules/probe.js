@@ -34,7 +34,7 @@ $.extend(Probe.prototype, {
       data = JSON.parse(data)
       info.data = data
 
-      var port = self.chross.port.findPortByTabId[details.tabId]
+      var port = self.chross.port.getPortByTabId[details.tabId]
 
       if (port) {
         port.postMessage({

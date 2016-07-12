@@ -1,26 +1,23 @@
 function Cache() {
   this.database = {}
+
+  this.init()
 }
 
 $.extend(Cache.prototype, {
-  getAllDataByTabId: function (tabId) {
+  setDataByTabId: function (tabId, key, data) {
     var self = this
 
-    var result = {
-      msg: 'The tab is not found',
-      data: null
+    var data = data || {}
+
+    if (!self.database.hasOwnProperty(tabId)) {
+      self.database[tabId] = {}
+    }
+    if (!self.database[tabId].hasOwnProperty(key)) {
+      self.database[tabId][key] = []
     }
 
-    var data = self.database[tabId]
-
-    if (data) {
-      result = {
-        msg: 'This is all data belongs to Tab#' + tabId,
-        data: data
-      }
-    }
-
-    return result
+    self.database[tabId][key].push(data)
   },
 
   getDataByTabId: function (tabId, key) {
@@ -51,22 +48,56 @@ $.extend(Cache.prototype, {
     return result
   },
 
-  setDataByTabId: function (tabId, data) {
+  getAllDataByTabId: function (tabId) {
     var self = this
 
-    var data = data || {}
-
-    if (!self.database.hasOwnProperty(tabId)) {
-      self.database[tabId] = {}
+    var result = {
+      msg: 'The tab is not found',
+      data: null
     }
 
-    $.extend(self.database[tabId], data)
+    var data = self.database[tabId]
+
+    if (data) {
+      result = {
+        msg: 'This is all data belongs to Tab#' + tabId,
+        data: data
+      }
+    }
+
+    return result
   },
 
   clearDataByTabId: function (tabId) {
     var self = this
 
     delete self.database[tabId]
+  },
+
+  onBeforeNavigate: function () {
+    var self = this
+
+    chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
+      if (details.frameId !== 0) return false
+
+      self.clearDataByTabId(details.tabId)
+    })
+  },
+
+  onTabRemoved: function () {
+    var self = this
+
+    chrome.tabs.onRemoved.addListener(function (tabId) {
+      self.clearDataByTabId(tabId)
+    })
+  },
+
+  init: function () {
+    var self = this
+
+    self.onBeforeNavigate()
+
+    self.onTabRemoved()
   }
 })
 
