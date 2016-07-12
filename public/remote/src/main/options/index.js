@@ -4,7 +4,7 @@ function Page(config) {
 
 }
 
-$.extend(Chross.prototype, {
+$.extend(Page.prototype, {
   init: function () {
   },
 
