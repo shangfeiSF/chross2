@@ -23,9 +23,8 @@ $.extend(Port.prototype, {
     var self = this
 
     self.ports.top.onMessage.addListener(function (msg) {
-      console.log(self.ports.top.name)
-      console.log(msg.type)
-      console.log(msg.content)
+      if (msg.uuid) return false
+      console.log(msg)
     })
 
     self.ports.top.onDisconnect.addListener(function (port) {
@@ -37,6 +36,15 @@ $.extend(Port.prototype, {
 
     return self.ports.top
   },
+
+  post: function (command, data) {
+    var self = this
+
+    self.getTopPort().postMessage({
+      cmd: command,
+      data: data
+    })
+  }
 })
 
 module.exports = Port

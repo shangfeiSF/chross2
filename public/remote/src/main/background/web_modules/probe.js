@@ -15,7 +15,7 @@ $.extend(Probe.prototype, {
     var self = this
 
     self.monitorCrossIframeUrl({
-      urls: [['*:', self.config.crossIframeURL, '*'].join('')]
+      urls: [['*:', self.chross.config.crossIframeURL, '*'].join('')]
     })
   },
 
@@ -34,16 +34,17 @@ $.extend(Probe.prototype, {
       data = JSON.parse(data)
       info.data = data
 
-      var port = self.chross.port.getPortByTabId[details.tabId]
+      var port = self.chross.port.getPortByTabId(details.tabId)
 
       if (port) {
         port.postMessage({
-          msg: 'run code in iframe',
+          type: 'private',
+          content: 'run code in iframe',
           uuid: data.uuid,
           data: info
         })
       }
-    }, options)
+    }, options, ["blocking"])
   },
 })
 

@@ -5,10 +5,43 @@ function Network(chross) {
 }
 
 $.extend(Network.prototype, {
+  cmesusIframe: function (details) {
+    var self = this
+
+    var needRecord = true
+    var result = self.chross.cache.getDataByTabId(details.tabId, 'iframeList')
+
+    if (result.data === null) {
+      if (result.msg.type == '404') {
+        needRecord = false
+      }
+      else if (result.msg.type == '405') {
+        needRecord = true
+      }
+    }
+    else {
+      needRecord = result.data.every(function (iframe) {
+        return iframe.frameId != details.frameId
+      })
+    }
+
+    if (needRecord) {
+      self.chross.cache.setDataByTabId(details.tabId, 'iframeIds', details.frameId)
+
+      self.chross.cache.setDataByTabId(details.tabId, 'iframeList', {
+        frameId: details.frameId,
+        url: details.url,
+        details: details
+      })
+    }
+  },
+
   onBeforeRequest: function () {
     var self = this
 
     chrome.webRequest.onBeforeRequest.addListener(function (details) {
+      self.cmesusIframe(details)
+
       self.chross.cache.setDataByTabId(details.tabId, 'onBeforeRequest', {
         url: details.url,
         details: details

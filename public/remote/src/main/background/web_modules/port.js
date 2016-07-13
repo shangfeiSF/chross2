@@ -13,6 +13,30 @@ $.extend(Port.prototype, {
     var port = port
 
     port.onMessage.addListener(function (msg) {
+      var cmd = msg.cmd
+      var data = msg.data
+
+      console.log(msg)
+
+      var handler = self.chross.agent.handler
+
+      var action = self.chross.agent.findAction(cmd)
+
+      if (action !== undefined) {
+        handler[action](data, port.sender)
+          .then(function () {
+            port.postMessage({
+              type: 'private',
+              content: 'Inject code to all iframes'
+            })
+          })
+      }
+      else {
+        port.postMessage({
+          type: 'private',
+          content: 'invalid command:' + cmd
+        })
+      }
     })
 
     // 页面刷新 & 页面关闭 都会自动触发 port.disconnect()

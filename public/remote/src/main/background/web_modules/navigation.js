@@ -141,14 +141,6 @@ $.extend(Navigation.prototype, {
 
     chrome.webNavigation.onDOMContentLoaded.addListener(function (details) {
       if (details.frameId !== 0) return false
-
-      chrome.tabs.executeScript(details.tabId, {
-        code: self.chross.userContent,
-        allFrames: true,
-        matchAboutBlank: true
-      }, function () {
-        console.log('Injected user content')
-      })
     })
   },
 
@@ -162,7 +154,15 @@ $.extend(Navigation.prototype, {
 
       port && port.postMessage({
         type: 'private',
-        content: 'PageReady'
+        data: 'PageReady'
+      })
+
+      chrome.tabs.executeScript(details.tabId, {
+        code: self.chross.userContent,
+        allFrames: false,
+        matchAboutBlank: true
+      }, function () {
+        console.log('Injected user content')
       })
     })
   },

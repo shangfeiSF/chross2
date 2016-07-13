@@ -1,5 +1,5 @@
 function Cache() {
-  this.database = {}
+  this.tabsMap = {}
 
   this.init()
 }
@@ -8,16 +8,16 @@ $.extend(Cache.prototype, {
   setDataByTabId: function (tabId, key, data) {
     var self = this
 
-    var data = data || {}
+    var data = data !== undefined ? data : {}
 
-    if (!self.database.hasOwnProperty(tabId)) {
-      self.database[tabId] = {}
+    if (!self.tabsMap.hasOwnProperty(tabId)) {
+      self.tabsMap[tabId] = {}
     }
-    if (!self.database[tabId].hasOwnProperty(key)) {
-      self.database[tabId][key] = []
+    if (!self.tabsMap[tabId].hasOwnProperty(key)) {
+      self.tabsMap[tabId][key] = []
     }
 
-    self.database[tabId][key].push(data)
+    self.tabsMap[tabId][key].push(data)
   },
 
   getDataByTabId: function (tabId, key) {
@@ -25,21 +25,24 @@ $.extend(Cache.prototype, {
 
     var result = {
       msg: 'The tab is not found',
+      type: '404',
       data: null
     }
 
-    var data = self.database[tabId]
+    var data = self.tabsMap[tabId]
 
     if (data) {
       if (data.hasOwnProperty(key)) {
         result = {
           msg: 'This is the data belongs to Tab#' + tabId,
+          type: '200',
           data: data[key]
         }
       }
       else {
         result = {
           msg: 'There is no such data belongs to Tab#' + tabId,
+          type: '405',
           data: null
         }
       }
@@ -56,7 +59,7 @@ $.extend(Cache.prototype, {
       data: null
     }
 
-    var data = self.database[tabId]
+    var data = self.tabsMap[tabId]
 
     if (data) {
       result = {
@@ -71,7 +74,7 @@ $.extend(Cache.prototype, {
   clearDataByTabId: function (tabId) {
     var self = this
 
-    delete self.database[tabId]
+    delete self.tabsMap[tabId]
   },
 
   onBeforeNavigate: function () {

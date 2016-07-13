@@ -1,6 +1,14 @@
 var Port = require('port')
+var Probe = require('probe')
 
 function Chross(config) {
+  var config = config || {}
+
+  this.defaultConfig = {
+    crossIframeURL: '//gtms04.alicdn.com/tps/i4/TB1vX.wKVXXXXX7XXXX_RF9JFXX-1-1.gif'
+  }
+
+  this.config = $.extend(this.defaultConfig, config)
 }
 
 $.extend(Chross.prototype, {
@@ -8,17 +16,8 @@ $.extend(Chross.prototype, {
     var self = this
 
     self.port = new Port(this)
-  },
 
-  post: function (cmd, data) {
-    var self = this
-
-    var topPort = self.port.getTopPort()
-
-    topPort.postMessage({
-      cmd: cmd,
-      data: data
-    })
+    self.probe = new Probe(this)
   }
 })
 
