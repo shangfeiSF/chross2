@@ -14,19 +14,24 @@ function Chross(config) {
 
   this.config = $.extend(this.defaultConfig, config)
 
-  this.userContent =
-    "console.log(window.chross);" +
-    "var body = window.$('body');" +
-    "body.attr('data-test', 'chross');" +
-    "window.chross.probe.runCodeInIframe(function(){" +
-    "var body = document.getElementsByTagName('body')[0] || null;" +
-    "return body ? body.children.length : null" +
-    "}, {" +
-    "listener: function(result){" +
-    "console.log(result)" +
-    "}" +
-    "})"
+  this.userContent = $.trim((function () {
+    console.info(window.chross)
 
+    var body = window.$('body')
+    body.attr('data-test', 'chross')
+
+    window.chross.probe.runCodeInIframe(
+      function () {
+        var body = document.getElementsByTagName('body')[0] || null
+        return body ? body.children.length : null
+      },
+      {
+        listener: function (result) {
+          console.info(result.frameId, result.data.value)
+        }
+      }
+    )
+  }).toString().slice(14, -2))
 }
 
 $.extend(Chross.prototype, {
