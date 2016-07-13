@@ -1,5 +1,13 @@
-function Cache() {
-  this.tabsMap = {}
+function Cache(chross, config) {
+  var config = config || {}
+
+  var defaultConfig = {}
+
+  this.config = $.extend(defaultConfig, config)
+
+  this.tabsMap = {} 
+
+  this.chross = chross
 
   this.init()
 }
@@ -13,6 +21,7 @@ $.extend(Cache.prototype, {
     if (!self.tabsMap.hasOwnProperty(tabId)) {
       self.tabsMap[tabId] = {}
     }
+    
     if (!self.tabsMap[tabId].hasOwnProperty(key)) {
       self.tabsMap[tabId][key] = []
     }

@@ -1,4 +1,10 @@
-function Port(chross) {
+function Port(chross, config) {
+  var config = config || {}
+
+  var defaultConfig = {}
+
+  this.config = $.extend(defaultConfig, config)
+
   this.ports = {}
 
   this.chross = chross
@@ -15,8 +21,6 @@ $.extend(Port.prototype, {
     port.onMessage.addListener(function (msg) {
       var cmd = msg.cmd
       var data = msg.data
-
-      console.log(msg)
 
       var handler = self.chross.agent.handler
 

@@ -1,4 +1,10 @@
-function Navigation(chross) {
+function Navigation(chross, config) {
+  var config = config || {}
+
+  var defaultConfig = {}
+
+  this.config = $.extend(defaultConfig, config)
+
   this.content = {
     // 异步非阻塞的方式注入多个脚本（脚本注入的顺序与数组中声明的顺序无关）
     ayncScripts: [
@@ -162,7 +168,7 @@ $.extend(Navigation.prototype, {
         allFrames: false,
         matchAboutBlank: true
       }, function () {
-        console.log('Injected user content')
+        console.log('%cInjected user content', 'color: #bb1100; font-weight: bold;')
       })
     })
   },
