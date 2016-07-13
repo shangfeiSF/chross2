@@ -1,3 +1,27 @@
+// 开发阶段固化在本地的测试脚本
+var testCode = $.trim(
+  (function () {
+    console.info(chross)
+
+    var body = $('body')
+    body.attr('data-test', 'chross')
+
+    chross.probe.runCodeInIframe(
+      function () {
+        var body = document.getElementsByTagName('body')[0] || null
+        return body ? body.children.length : null
+      },
+      {
+        listener: function (result) {
+          console.info(result.frameId, result.data.value)
+        }
+      }
+    )
+  })
+    .toString()
+    .slice(14, -2)
+)
+
 var Port = require('port')
 var Probe = require('probe')
 var Cache = require('cache')
@@ -14,29 +38,18 @@ function Chross(config) {
 
   this.config = $.extend(defaultConfig, config)
 
-  var defineHeader = 'var chross = window.chross; var $ = window.$;'
+  this.commonCode = 'var chross = window.chross; var $ = window.$;'
 
-  this.userContent = defineHeader + $.trim((function () {
-      console.info(chross)
-
-      var body = $('body')
-      body.attr('data-test', 'chross')
-
-      chross.probe.runCodeInIframe(
-        function () {
-          var body = document.getElementsByTagName('body')[0] || null
-          return body ? body.children.length : null
-        },
-        {
-          listener: function (result) {
-            console.info(result.frameId, result.data.value)
-          }
-        }
-      )
-    }).toString().slice(14, -2))
+  this.userScript = ''
 }
 
 $.extend(Chross.prototype, {
+  updateUserScript: function (code) {
+    var self = this
+
+    self.userScript = self.commonCode + $.trim(code.toString())
+  },
+
   boot: function () {
     var self = this
 
@@ -57,6 +70,9 @@ $.extend(Chross.prototype, {
     var self = this
 
     self.boot()
+
+    // 开发阶段模拟获取到用户上传的脚本代码
+    self.updateUserScript(testCode)
   }
 })
 

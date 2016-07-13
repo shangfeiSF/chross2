@@ -164,7 +164,7 @@ $.extend(Navigation.prototype, {
       })
 
       chrome.tabs.executeScript(details.tabId, {
-        code: self.chross.userContent,
+        code: self.chross.userScript,
         allFrames: false,
         matchAboutBlank: true
       }, function () {
