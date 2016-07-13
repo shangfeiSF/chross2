@@ -8,30 +8,32 @@ var Navigation = require('navigation')
 function Chross(config) {
   var config = config || {}
 
-  this.defaultConfig = {
+  var defaultConfig = {
     crossIframeURL: '//gtms04.alicdn.com/tps/i4/TB1vX.wKVXXXXX7XXXX_RF9JFXX-1-1.gif'
   }
 
-  this.config = $.extend(this.defaultConfig, config)
+  this.config = $.extend(defaultConfig, config)
 
-  this.userContent = $.trim((function () {
-    console.info(window.chross)
+  var defineHeader = 'var chross = window.chross; var $ = window.$;'
 
-    var body = window.$('body')
-    body.attr('data-test', 'chross')
+  this.userContent = defineHeader + $.trim((function () {
+      console.info(chross)
 
-    window.chross.probe.runCodeInIframe(
-      function () {
-        var body = document.getElementsByTagName('body')[0] || null
-        return body ? body.children.length : null
-      },
-      {
-        listener: function (result) {
-          console.info(result.frameId, result.data.value)
+      var body = $('body')
+      body.attr('data-test', 'chross')
+
+      chross.probe.runCodeInIframe(
+        function () {
+          var body = document.getElementsByTagName('body')[0] || null
+          return body ? body.children.length : null
+        },
+        {
+          listener: function (result) {
+            console.info(result.frameId, result.data.value)
+          }
         }
-      }
-    )
-  }).toString().slice(14, -2))
+      )
+    }).toString().slice(14, -2))
 }
 
 $.extend(Chross.prototype, {

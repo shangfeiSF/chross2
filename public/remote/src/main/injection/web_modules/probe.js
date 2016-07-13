@@ -1,14 +1,14 @@
 function Probe(chross) {
   var config = config || {}
 
-  this.defaultConfig = {}
+  var defaultConfig = {}
 
-  this.config = $.extend(this.defaultConfig, config)
-
-  this.chross = chross
+  this.config = $.extend(defaultConfig, config)
 
   this.runCodeListeners = {}
 
+  this.chross = chross
+  
   this.init()
 }
 
@@ -35,7 +35,7 @@ $.extend(Probe.prototype, {
 
     topPort.onMessage.addListener(function (msg) {
       if (msg.uuid === undefined) return false
-      
+
       self.resolveListenerByUuid(msg.uuid, msg.data)
     })
 

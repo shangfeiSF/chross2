@@ -1,4 +1,5 @@
 var Handler = require('handler')
+
 function Agent(chross, config) {
   var config = config || {}
 

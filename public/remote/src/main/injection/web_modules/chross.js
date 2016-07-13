@@ -4,11 +4,11 @@ var Probe = require('probe')
 function Chross(config) {
   var config = config || {}
 
-  this.defaultConfig = {
+  var defaultConfig = {
     crossIframeURL: '//gtms04.alicdn.com/tps/i4/TB1vX.wKVXXXXX7XXXX_RF9JFXX-1-1.gif'
   }
 
-  this.config = $.extend(this.defaultConfig, config)
+  this.config = $.extend(defaultConfig, config)
 }
 
 $.extend(Chross.prototype, {

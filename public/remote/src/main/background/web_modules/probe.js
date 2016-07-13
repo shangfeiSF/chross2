@@ -1,9 +1,9 @@
 function Probe(chross, config) {
   var config = config || {}
 
-  this.defaultConfig = {}
+  var defaultConfig = {}
 
-  this.config = $.extend(this.defaultConfig, config)
+  this.config = $.extend(defaultConfig, config)
 
   this.chross = chross
 
