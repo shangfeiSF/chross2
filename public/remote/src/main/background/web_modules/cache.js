@@ -42,7 +42,6 @@ $.extend(Cache.prototype, {
       msg: 'Set data to ' + key + ' belongs to the lastest view of tab ' + tabId,
       data: activeTabViewStore[key]
     }
-
   },
 
   exists: function (tabId, key) {
@@ -250,12 +249,31 @@ $.extend(Cache.prototype, {
     var self = this
 
     chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
+      console.log('onBeforeNavigate')
       if (details.frameId !== 0) return false
 
-      self.createViewStore(details.tabId).then(function (tabViewStore) {
-        if (tabViewStore !== null) {
-          console.log(self.chross.cache.tabsMap[details.tabId])
-        }
+      var tabStore = self.tabsMap[details.tabId]
+
+      if (!tabStore) {
+        self.tabsMap[details.tabId] = {}
+      } else {
+        self.createViewStore(details.tabId).then(function (tabViewStore) {
+          if (tabViewStore !== null) {
+            console.log('create a new tab view of tab ' + details.tabId)
+          }
+        })
+      }
+
+    })
+  },
+
+  onTabCreated: function () {
+    var self = this
+
+    chrome.tabs.onCreated.addListener(function (tab) {
+      console.log('onTabCreated')
+      self.tabsMap[tab.id] = new Array({
+        timeStamp: new Date().toJSON()
       })
     })
   },
@@ -272,6 +290,8 @@ $.extend(Cache.prototype, {
     var self = this
 
     self.onBeforeNavigate()
+
+    self.onTabCreated()
 
     self.onTabRemoved()
   }

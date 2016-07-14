@@ -19,9 +19,10 @@ $.extend(Network.prototype, {
     var self = this
 
     chrome.webRequest.onBeforeRequest.addListener(function (details) {
+      console.warn(details.url)
       self.census.cnesusIframe(details)
 
-      self.chross.cache.setDataByTabId(details.tabId, 'onBeforeRequest', {
+      self.chross.cache.set(details.tabId, 'onBeforeRequest', {
         url: details.url,
         details: details
       })
@@ -34,7 +35,7 @@ $.extend(Network.prototype, {
     var self = this
 
     chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
-      self.chross.cache.setDataByTabId(details.tabId, 'onBeforeSendHeaders', {
+      self.chross.cache.set(details.tabId, 'onBeforeSendHeaders', {
         url: details.url,
         details: details
       })
@@ -46,7 +47,7 @@ $.extend(Network.prototype, {
   onSendHeaders: function () {
     var self = this
     chrome.webRequest.onSendHeaders.addListener(function (details) {
-      self.chross.cache.setDataByTabId(details.tabId, 'onSendHeaders', {
+      self.chross.cache.set(details.tabId, 'onSendHeaders', {
         url: details.url,
         details: details
       })
@@ -58,7 +59,7 @@ $.extend(Network.prototype, {
   onHeadersReceived: function () {
     var self = this
     chrome.webRequest.onHeadersReceived.addListener(function (details) {
-      self.chross.cache.setDataByTabId(details.tabId, 'onHeadersReceived', {
+      self.chross.cache.set(details.tabId, 'onHeadersReceived', {
         url: details.url,
         details: details
       })
@@ -71,7 +72,7 @@ $.extend(Network.prototype, {
     var self = this
 
     chrome.webRequest.onBeforeRedirect.addListener(function (details) {
-      self.chross.cache.setDataByTabId(details.tabId, 'onBeforeRedirect', {
+      self.chross.cache.set(details.tabId, 'onBeforeRedirect', {
         url: details.url,
         details: details
       })
@@ -84,7 +85,7 @@ $.extend(Network.prototype, {
     var self = this
 
     chrome.webRequest.onResponseStarted.addListener(function (details) {
-      self.chross.cache.setDataByTabId(details.tabId, 'onResponseStarted', {
+      self.chross.cache.set(details.tabId, 'onResponseStarted', {
         url: details.url,
         details: details
       })
@@ -97,7 +98,7 @@ $.extend(Network.prototype, {
     var self = this
 
     chrome.webRequest.onCompleted.addListener(function (details) {
-      self.chross.cache.setDataByTabId(details.tabId, 'onCompleted', {
+      self.chross.cache.set(details.tabId, 'onCompleted', {
         url: details.url,
         details: details
       })
@@ -110,7 +111,7 @@ $.extend(Network.prototype, {
     var self = this
 
     chrome.webRequest.onErrorOccurred.addListener(function (details) {
-      self.chross.cache.setDataByTabId(details.tabId, 'onErrorOccurred', {
+      self.chross.cache.set(details.tabId, 'onErrorOccurred', {
         url: details.url,
         details: details
       })
@@ -124,13 +125,46 @@ $.extend(Network.prototype, {
     var pattern = new RegExp(urlPattern)
 
     var details = {
-      msg: ['The details of', urlPattern.toString(), 'occur', moments.join(', ')].join(' '),
+      msg: ['The details of', urlPattern.toString(), 'occur', moments.join(', '), 'of the lastest view of tab', tabId].join(' '),
       error: null,
       data: {}
     }
 
     moments.forEach(function (monment) {
-      var records = self.chross.cache.getDataByTabId(tabId, monment)
+      var records = self.chross.cache.get(tabId, monment)
+
+      if (records.data) {
+        var matches = records.data.filter(function (record) {
+          return pattern.exec(record.url) !== null
+        })
+
+        details.data[monment] = matches
+      }
+      else {
+        if (details.error === null) {
+          details.error = {}
+        }
+        details.error[monment] = records.msg
+
+        details.data[monment] = null
+      }
+    })
+
+    return details
+  },
+
+  getDetailsView: function (moments, tabId, viewIndex, urlPattern) {
+    var self = this
+    var pattern = new RegExp(urlPattern)
+
+    var details = {
+      msg: ['The details of', urlPattern.toString(), 'occur', moments.join(', '), 'of the view ranked', viewIndex, 'of tab', tabId].join(' '),
+      error: null,
+      data: {}
+    }
+
+    moments.forEach(function (monment) {
+      var records = self.chross.cache.getInView(tabId, viewIndex, monment)
 
       if (records.data) {
         var matches = records.data.filter(function (record) {

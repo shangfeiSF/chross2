@@ -38,11 +38,11 @@ $.extend(Chross.prototype, {
   boot: function () {
     var self = this
 
+    self.cache = new Cache(this)
+
     self.network = new Network(this)
 
     self.navigation = new Navigation(this)
-
-    self.cache = new Cache(this)
 
     self.probe = new Probe(this)
 
