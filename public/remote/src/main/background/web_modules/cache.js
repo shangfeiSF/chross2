@@ -5,7 +5,7 @@ function Cache(chross, config) {
 
   this.config = $.extend(defaultConfig, config)
 
-  this.tabsMap = {} 
+  this.tabsMap = {}
 
   this.chross = chross
 
@@ -13,77 +13,237 @@ function Cache(chross, config) {
 }
 
 $.extend(Cache.prototype, {
-  setDataByTabId: function (tabId, key, data) {
+  set: function (tabId, key, data) {
     var self = this
-
     var data = data !== undefined ? data : {}
 
-    if (!self.tabsMap.hasOwnProperty(tabId)) {
-      self.tabsMap[tabId] = {}
-    }
-    
-    if (!self.tabsMap[tabId].hasOwnProperty(key)) {
-      self.tabsMap[tabId][key] = []
-    }
-
-    self.tabsMap[tabId][key].push(data)
-  },
-
-  getDataByTabId: function (tabId, key) {
-    var self = this
-
-    var result = {
-      msg: 'The tab is not found',
-      type: '404',
-      data: null
-    }
-
-    var data = self.tabsMap[tabId]
-
-    if (data) {
-      if (data.hasOwnProperty(key)) {
-        result = {
-          msg: 'This is the data belongs to Tab#' + tabId,
-          type: '200',
-          data: data[key]
-        }
-      }
-      else {
-        result = {
-          msg: 'There is no such data belongs to Tab#' + tabId,
-          type: '405',
-          data: null
-        }
+    var tabStore = self.tabsMap[tabId]
+    if (!tabStore) {
+      return {
+        msg: 'Can not set data by tabId ' + tabId,
+        data: null
       }
     }
 
-    return result
-  },
-
-  getAllDataByTabId: function (tabId) {
-    var self = this
-
-    var result = {
-      msg: 'The tab is not found',
-      data: null
+    var activeTabViewStore = tabStore[tabStore.length - 1]
+    if (!activeTabViewStore) {
+      return {
+        msg: 'There is no views of tab ' + tabId,
+        data: null
+      }
     }
 
-    var data = self.tabsMap[tabId]
+    if (!activeTabViewStore.hasOwnProperty(key)) {
+      activeTabViewStore[key] = []
+    }
+    activeTabViewStore[key].push(data)
 
-    if (data) {
+    return {
+      msg: 'Set data to ' + key + ' belongs to the lastest view of tab ' + tabId,
+      data: activeTabViewStore[key]
+    }
+
+  },
+
+  exists: function (tabId, key) {
+    var self = this
+
+    var tabStore = self.tabsMap[tabId]
+    if (!tabStore) {
+      return {
+        msg: 'Can not check the existence by tabId ' + tabId,
+        data: null
+      }
+    }
+
+    var activeTabViewStore = tabStore[tabStore.length - 1]
+    if (!activeTabViewStore) {
+      return {
+        msg: 'There is no views of tab ' + tabId,
+        data: null
+      }
+    }
+
+    return {
+      msg: 'The check result of the existence of ' + key + ' belongs to the lastest view of tab ' + tabId,
+      data: activeTabViewStore.hasOwnProperty(key)
+    }
+  },
+
+  get: function (tabId, key) {
+    var self = this
+
+    var tabStore = self.tabsMap[tabId]
+    if (!tabStore) {
+      return {
+        msg: 'Can not get data by tabId ' + tabId,
+        data: null
+      }
+    }
+
+    var activeTabViewStore = tabStore[tabStore.length - 1]
+    if (!activeTabViewStore) {
+      return {
+        msg: 'There is no views of tab ' + tabId,
+        data: null
+      }
+    }
+
+    var result = {
+      msg: 'There is no ' + key + ' belongs to the lastest view of tab ' + tabId,
+      data: null
+    }
+    if (activeTabViewStore.hasOwnProperty(key)) {
       result = {
-        msg: 'This is all data belongs to Tab#' + tabId,
-        data: data
+        msg: 'This is the data of ' + key + ' belongs to the lastest view of tab ' + tabId,
+        data: activeTabViewStore[key]
       }
     }
 
     return result
   },
 
-  clearDataByTabId: function (tabId) {
+  getAll: function (tabId) {
+    var self = this
+
+    var tabStore = self.tabsMap[tabId]
+    if (!tabStore) {
+      return {
+        msg: 'Can not get all data by tabId ' + tabId,
+        data: null
+      }
+    }
+
+    return {
+      msg: 'This is the all data belongs to the lastest view of tab ' + tabId,
+      data: tabStore
+    }
+  },
+
+  existsInView: function (tabId, viewIndex, key) {
+    var self = this
+
+    var tabStore = self.tabsMap[tabId]
+    if (!tabStore) {
+      return {
+        msg: 'Can not check the existence by tabId ' + tabId,
+        data: null
+      }
+    }
+
+    var activeTabViewStore = tabStore[viewIndex]
+    if (!activeTabViewStore) {
+      return {
+        msg: 'There is no view ranked ' + viewIndex + ' of tab ' + tabId,
+        data: null
+      }
+    }
+
+    return {
+      msg: 'The check result of the existence of ' + key + ' belongs to the view ranked' + viewIndex + 'of tab ' + tabId,
+      data: activeTabViewStore.hasOwnProperty(key)
+    }
+  },
+
+  getInView: function (tabId, viewIndex, key) {
+    var self = this
+
+    var tabStore = self.tabsMap[tabId]
+    if (!tabStore) {
+      return {
+        msg: 'Can not get data by tabId ' + tabId,
+        data: null
+      }
+    }
+
+    var tabViewStore = tabStore[viewIndex]
+    if (!tabViewStore) {
+      return {
+        msg: 'There is no view ranked ' + viewIndex + ' of tab ' + tabId,
+        data: null
+      }
+    }
+
+    var result = {
+      msg: 'There is no ' + key + ' belongs to the view ranked' + viewIndex + ' of tab ' + tabId,
+      data: null
+    }
+
+    if (tabViewStore.hasOwnProperty(key)) {
+      result = {
+        msg: 'This is the data of ' + key + ' belongs to the view ranked' + viewIndex + ' of tab ' + tabId,
+        data: tabViewStore[key]
+      }
+    }
+
+    return result
+  },
+
+  getAllInView: function (tabId, viewIndex) {
+    var self = this
+
+    var tabStore = self.tabsMap[tabId]
+    if (!tabStore) {
+      return {
+        msg: 'Can not get all data by tabId ' + tabId,
+        data: null
+      }
+    }
+
+    var tabViewStore = tabStore[viewIndex]
+    if (!tabViewStore) {
+      return {
+        msg: 'There is no view ranked ' + viewIndex + ' of tab ' + tabId,
+        data: null
+      }
+    }
+
+    return {
+      msg: 'This is the all data belongs to the view ranked' + viewIndex + ' of tab ' + tabId,
+      data: tabViewStore
+    }
+  },
+
+  clear: function (tabId) {
     var self = this
 
     delete self.tabsMap[tabId]
+  },
+
+  createViewStore: function (tabId) {
+    var self = this
+
+    var defer = $.Deferred()
+    var promise = defer.promise()
+
+    chrome.tabs.query({
+      active: true
+    }, function (tabs) {
+      var activeTab = tabs[0]
+
+      if (activeTab && activeTab.id == tabId) {
+        var tabStore = self.tabsMap[tabId]
+        var timeStamp = new Date().toJSON()
+
+        if (tabStore === undefined) {
+          self.tabsMap[tabId] = new Array({
+            timeStamp: timeStamp
+          })
+        }
+        else {
+          tabStore.push({
+            timeStamp: timeStamp
+          })
+        }
+
+        defer.resolve(tabStore[tabStore.length - 1])
+      }
+      else {
+        defer.resolve(null)
+      }
+    })
+
+    return promise
   },
 
   onBeforeNavigate: function () {
@@ -92,7 +252,11 @@ $.extend(Cache.prototype, {
     chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
       if (details.frameId !== 0) return false
 
-      self.clearDataByTabId(details.tabId)
+      self.createViewStore(details.tabId).then(function (tabViewStore) {
+        if (tabViewStore !== null) {
+          console.log(self.chross.cache.tabsMap[details.tabId])
+        }
+      })
     })
   },
 
@@ -100,7 +264,7 @@ $.extend(Cache.prototype, {
     var self = this
 
     chrome.tabs.onRemoved.addListener(function (tabId) {
-      self.clearDataByTabId(tabId)
+      self.clear(tabId)
     })
   },
 
