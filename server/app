@@ -8,6 +8,7 @@ var express = require('express')
 var app = express()
 
 app.use(express.static(path.join(process.cwd(), './public/remote/build')))
+app.use(express.static(path.join(process.cwd(), './public')))
 
 app.listen(80, function () {
   console.log('[Server] -- listening localhost:80....'.green)

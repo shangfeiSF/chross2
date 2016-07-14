@@ -1,33 +1,10 @@
-// 开发阶段固化在本地的测试脚本
-var testCode = $.trim(
-  (function () {
-    console.info(chross)
-
-    var body = $('body')
-    body.attr('data-test', 'chross')
-
-    chross.probe.runCodeInIframe(
-      function () {
-        var body = document.getElementsByTagName('body')[0] || null
-        return body ? body.children.length : null
-      },
-      {
-        listener: function (result) {
-          console.info(result.frameId, result.data.value)
-        }
-      }
-    )
-  })
-    .toString()
-    .slice(14, -2)
-)
-
 var Port = require('port')
 var Probe = require('probe')
 var Cache = require('cache')
 var Agent = require('agent')
 var Network = require('network')
 var Navigation = require('navigation')
+var Loader = require('loader')
 
 function Chross(config) {
   var config = config || {}
@@ -41,13 +18,21 @@ function Chross(config) {
   this.commonCode = 'var chross = window.chross; var $ = window.$;'
 
   this.userScript = ''
+
+  this.urlsList = []
 }
 
 $.extend(Chross.prototype, {
-  updateUserScript: function (code) {
+  updateUserScript: function (userScript) {
     var self = this
 
-    self.userScript = self.commonCode + $.trim(code.toString())
+    self.userScript = self.commonCode + $.trim(userScript.toString())
+  },
+
+  updateUrlsList: function (urlsList) {
+    var self = this
+
+    self.urlsList = urlsList
   },
 
   boot: function () {
@@ -64,15 +49,14 @@ $.extend(Chross.prototype, {
     self.agent = new Agent(this)
 
     self.port = new Port(this)
+
+    self.loader = new Loader(this)
   },
 
   init: function () {
     var self = this
 
     self.boot()
-
-    // 开发阶段模拟获取到用户上传的脚本代码
-    self.updateUserScript(testCode)
   }
 })
 
