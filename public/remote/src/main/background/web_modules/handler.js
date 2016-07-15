@@ -32,12 +32,40 @@ var actions = {
     var defer = $.Deferred()
     var promise = defer.promise()
 
-    chrome.tabs.executeScript(sender.tab.id, {
+    var tabId = sender.tab.id
+
+    chrome.tabs.executeScript(tabId, {
       code: self._assembleCode(data),
       allFrames: true,
       matchAboutBlank: true
     }, function () {
-      defer.resolve()
+      defer.resolve({
+        type: 'private',
+        content: 'executeScript in all frames of  ' + tabId,
+      })
+    })
+
+    return promise
+  },
+
+  urlChange: function (data, sender) {
+
+    var self = this
+
+    var defer = $.Deferred()
+    var promise = defer.promise()
+
+    var tabId = sender.tab.id
+
+    // lock lastest viewStore
+    self.chross.cache.mockTabCreated(tabId)
+
+    defer.resolve({
+      type: 'private',
+      content: 'locked the lastest viewStore of tab ' + tabId,
+      url: data.url,
+      sign: data.sign,
+      timeStamp: data.timeStamp,
     })
 
     return promise

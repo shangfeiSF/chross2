@@ -31,13 +31,13 @@ $.extend(Loader.prototype, {
         self.chross.updateUserScript(userScript)
         // 更新chross中注册的URL列表
         self.chross.updateUrlsList(JSON.parse(urlsList).all)
-        
+
         chrome.tabs.create({
           url: self.chross.urlsList[0],
           active: true
-        }, function (details) {
-          console.log(details.tabId)
-          var message = '%c[Got UserScript and urlsList'
+        }, function (tab) {
+          console.log(tab)
+          var message = '%cGot UserScript and urlsList'
           console.log(message, 'color: #bb1100; font-weight: bold;')
         })
       })

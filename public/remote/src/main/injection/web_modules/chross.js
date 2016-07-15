@@ -1,5 +1,6 @@
 var Port = require('port')
 var Probe = require('probe')
+var Navigation = require('navigation')
 
 function Chross(config) {
   var config = config || {}
@@ -18,6 +19,8 @@ $.extend(Chross.prototype, {
     self.port = new Port(this)
 
     self.probe = new Probe(this)
+
+    self.navigation = new Navigation(this)
   }
 })
 

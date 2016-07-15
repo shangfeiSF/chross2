@@ -9,6 +9,19 @@ function Network(chross, config) {
 
   this.census = new Census(chross)
 
+  this.moments = ['onBeforeRequest', 'onBeforeSendHeaders', 'onSendHeaders', 'onHeadersReceived', 'onBeforeRedirect', 'onResponseStarted', 'onCompleted', 'onErrorOccurred']
+
+  this.malias = {
+    brq: 'onBeforeRequest',
+    bsh: 'onBeforeSendHeaders',
+    sh: 'onSendHeaders',
+    hr: 'onHeadersReceived',
+    brd: 'onBeforeRedirect',
+    rs: 'onResponseStarted',
+    c: 'onCompleted',
+    eo: 'onErrorOccurred'
+  }
+
   this.chross = chross
 
   this.init()
@@ -19,7 +32,6 @@ $.extend(Network.prototype, {
     var self = this
 
     chrome.webRequest.onBeforeRequest.addListener(function (details) {
-      console.warn(details.url)
       self.census.cnesusIframe(details)
 
       self.chross.cache.set(details.tabId, 'onBeforeRequest', {
@@ -120,7 +132,7 @@ $.extend(Network.prototype, {
     })
   },
 
-  getDetails: function (moments, tabId, urlPattern) {
+  get: function (moments, tabId, urlPattern) {
     var self = this
     var pattern = new RegExp(urlPattern)
 
@@ -153,7 +165,7 @@ $.extend(Network.prototype, {
     return details
   },
 
-  getDetailsView: function (moments, tabId, viewIndex, urlPattern) {
+  getView: function (moments, tabId, viewIndex, urlPattern) {
     var self = this
     var pattern = new RegExp(urlPattern)
 
@@ -189,14 +201,23 @@ $.extend(Network.prototype, {
   boot: function () {
     var self = this
 
-    self.getDetailsOnBeforeRequest = self.getDetails.bind(self, ['onBeforeRequest'])
-    self.getDetailsOnBeforeSendHeaders = self.getDetails.bind(self, ['onBeforeSendHeaders'])
-    self.getDetailsOnSendHeaders = self.getDetails.bind(self, ['onSendHeaders'])
-    self.getDetailsOnHeadersReceived = self.getDetails.bind(self, ['onHeadersReceived'])
-    self.getDetailsOnBeforeRedirect = self.getDetails.bind(self, ['onBeforeRedirect'])
-    self.getDetailsOnResponseStarted = self.getDetails.bind(self, ['onResponseStarted'])
-    self.getDetailsOnCompleted = self.getDetails.bind(self, ['onCompleted'])
-    self.getDetailsOnErrorOccurred = self.getDetails.bind(self, ['onErrorOccurred'])
+    self.getOnBeforeRequest = self.get.bind(self, ['onBeforeRequest'])
+    self.getOnBeforeSendHeaders = self.get.bind(self, ['onBeforeSendHeaders'])
+    self.getOnSendHeaders = self.get.bind(self, ['onSendHeaders'])
+    self.getOnHeadersReceived = self.get.bind(self, ['onHeadersReceived'])
+    self.getOnBeforeRedirect = self.get.bind(self, ['onBeforeRedirect'])
+    self.getOnResponseStarted = self.get.bind(self, ['onResponseStarted'])
+    self.getOnCompleted = self.get.bind(self, ['onCompleted'])
+    self.getOnErrorOccurred = self.get.bind(self, ['onErrorOccurred'])
+
+    self.getViewOnBeforeRequest = self.getView.bind(self, ['onBeforeRequest'])
+    self.getViewOnBeforeSendHeaders = self.getView.bind(self, ['onBeforeSendHeaders'])
+    self.getViewOnSendHeaders = self.getView.bind(self, ['onSendHeaders'])
+    self.getViewOnHeadersReceived = self.getView.bind(self, ['onHeadersReceived'])
+    self.getViewOnBeforeRedirect = self.getView.bind(self, ['onBeforeRedirect'])
+    self.getViewOnResponseStarted = self.getView.bind(self, ['onResponseStarted'])
+    self.getViewOnCompleted = self.getView.bind(self, ['onCompleted'])
+    self.getViewOnErrorOccurred = self.getView.bind(self, ['onErrorOccurred'])
   },
 
   init: function () {

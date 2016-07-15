@@ -18,3 +18,12 @@ chross.probe.runCodeInIframe(function () {
     console.info(result.frameId, result.data.value)
   }
 })
+
+setTimeout(function () {
+  chross.navigation.urlChange('http://www.sina.com.cn/')
+    .then(function (result) {
+      if (result.allow) {
+        window.location.href = result.url
+      }
+    })
+}, 10000)

@@ -1,4 +1,4 @@
-function Probe(chross) {
+function Probe(chross, config) {
   var config = config || {}
 
   var defaultConfig = {}

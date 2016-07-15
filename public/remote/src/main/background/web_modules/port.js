@@ -28,11 +28,8 @@ $.extend(Port.prototype, {
 
       if (action !== undefined) {
         handler[action](data, port.sender)
-          .then(function () {
-            port.postMessage({
-              type: 'private',
-              content: 'Inject code to all iframes'
-            })
+          .then(function (result) {
+            port.postMessage(result)
           })
       }
       else {

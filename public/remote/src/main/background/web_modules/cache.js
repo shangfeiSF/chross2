@@ -209,31 +209,27 @@ $.extend(Cache.prototype, {
     delete self.tabsMap[tabId]
   },
 
-  createViewStore: function (tabId) {
+  createNewViewStore: function (tabId) {
     var self = this
 
     var defer = $.Deferred()
     var promise = defer.promise()
 
+    console.log('createViewStore')
     chrome.tabs.query({
       active: true
     }, function (tabs) {
+      console.log('query callback')
       var activeTab = tabs[0]
 
       if (activeTab && activeTab.id == tabId) {
+        // tabStore一定存在，因为 onTabCreated 先于 onBeforeNavigate 触发
         var tabStore = self.tabsMap[tabId]
-        var timeStamp = new Date().toJSON()
 
-        if (tabStore === undefined) {
-          self.tabsMap[tabId] = new Array({
-            timeStamp: timeStamp
-          })
-        }
-        else {
-          tabStore.push({
-            timeStamp: timeStamp
-          })
-        }
+        tabStore.push({
+          timeStamp: new Date().toJSON(),
+          waiting: false
+        })
 
         defer.resolve(tabStore[tabStore.length - 1])
       }
@@ -245,25 +241,39 @@ $.extend(Cache.prototype, {
     return promise
   },
 
+  mockTabCreated: function (tabId) {
+    var self = this
+
+    var tabStore = self.tabsMap[tabId]
+
+    tabStore.push({
+      timeStamp: new Date().toJSON(),
+      waiting: true
+    })
+  },
+
   onBeforeNavigate: function () {
     var self = this
 
     chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
-      console.log('onBeforeNavigate')
       if (details.frameId !== 0) return false
+      console.log('onBeforeNavigate')
+      // 只要改变（包括刷新）已打开的标签页（手动or脚本）
+      var tabId = details.tabId
+      // tabStore一定存在，因为 onTabCreated 先于 onBeforeNavigate 触发
+      var tabStore = self.tabsMap[tabId]
+      var viewStore = tabStore[tabStore.length - 1]
 
-      var tabStore = self.tabsMap[details.tabId]
-
-      if (!tabStore) {
-        self.tabsMap[details.tabId] = {}
-      } else {
-        self.createViewStore(details.tabId).then(function (tabViewStore) {
-          if (tabViewStore !== null) {
-            console.log('create a new tab view of tab ' + details.tabId)
-          }
+      if (viewStore.waiting) {
+        // 无需创建新的viewStore
+        viewStore.waiting = false
+      }
+      else {
+        // 需要创建一个新的viewStore，并且立即启用（waiting = false）
+        self.createNewViewStore(tabId).then(function (tabViewStore) {
+          console.log('createViewStore then')
         })
       }
-
     })
   },
 
@@ -272,8 +282,12 @@ $.extend(Cache.prototype, {
 
     chrome.tabs.onCreated.addListener(function (tab) {
       console.log('onTabCreated')
+      // 只要新打开一个标签页，就需要新建一个tabStore数组
+      // 并且初始化一个viewStore
+      // waiting = true 表示该viewStore正在等待存储数据
       self.tabsMap[tab.id] = new Array({
-        timeStamp: new Date().toJSON()
+        timeStamp: new Date().toJSON(),
+        waiting: true
       })
     })
   },
