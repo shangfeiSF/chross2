@@ -468,14 +468,25 @@ $.extend(Cache.prototype,
       return promise
     },
 
-    mockTabCreated: function (tabId) {
+    createTabStore: function (tabId) {
       var self = this
 
-      self.createViewStore(tabId, true)
+      self.tabsMap[tabId] = new Array()
+      self.userTabsMap[tabId] = new Array()
+    },
+
+    clearTabStore: function (tabId) {
+      var self = this
+
+      delete self.tabsMap[tabId]
+      delete self.userTabsMap[tabId]
     },
 
     createViewStore: function (tabId, isWaiting) {
       var self = this
+
+      var tabStore = self.tabsMap[tabId]
+      var userTabStore = self.userTabsMap[tabId]
 
       var timeStamp = new Date().toJSON()
 
@@ -491,15 +502,8 @@ $.extend(Cache.prototype,
         userViewStore.waiting = true
       }
 
-      self.tabsMap[tabId] = new Array(viewStore)
-      self.userTabsMap[tabId] = new Array(userViewStore)
-    },
-
-    clearTabStore: function (tabId) {
-      var self = this
-
-      delete self.tabsMap[tabId]
-      delete self.userTabsMap[tabId]
+      tabStore.push(viewStore)
+      userTabStore.push(userViewStore)
     }
   },
   // Cache 监听的三个关键时刻：onBeforeNavigate，onTabCreated，onTabRemoved
@@ -549,6 +553,7 @@ $.extend(Cache.prototype,
          * 并设置 waiting = true，保证在之后的 onBeforeNavigate 中不再创建新的store
          * 而是直接启用 waiting = true 的viewStore，并 delete waiting
          * */
+        self.createTabStore(tab.id)
         self.createViewStore(tab.id, true)
       })
     },

@@ -57,12 +57,11 @@ var actions = {
 
     var tabId = sender.tab.id
 
-    // lock lastest viewStore
-    self.chross.cache.mockTabCreated(tabId)
+    self.chross.cache.createViewStore(tabId, true)
 
     defer.resolve({
       type: 'private',
-      content: 'locked the lastest viewStore of tab ' + tabId,
+      content: 'created a new viewStore belongs to the tab with tabId=' + tabId,
       url: data.url,
       sign: data.sign,
       timeStamp: data.timeStamp,

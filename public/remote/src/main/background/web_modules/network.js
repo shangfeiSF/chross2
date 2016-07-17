@@ -119,7 +119,7 @@ core.filterAPIs = {
         else {
           return {
             key: item.key,
-            values: item.values.filter(function (value) {
+            value: item.value.filter(function (value) {
               return pattern.exec(value.url) !== null
             })
           }
@@ -143,7 +143,7 @@ core.filterAPIs = {
         else {
           return {
             key: item.key,
-            values: item.values.filter(function (value) {
+            value: item.value.filter(function (value) {
               return pattern.exec(value.url) !== null
             })
           }
@@ -167,7 +167,7 @@ core.filterAPIs = {
         else {
           return {
             key: item.key,
-            values: item.values.filter(function (value) {
+            value: item.value.filter(function (value) {
               return pattern.exec(value.url) !== null
             })
           }
@@ -251,7 +251,7 @@ $.extend(Network.prototype,
             })
             derivativeAPIs[coreAPI + 'onAllMoments'] = self[coreAPI].bind(self, self.moments)
 
-            $.extend(Cache.prototype, derivativeAPIs)
+            $.extend(Network.prototype, derivativeAPIs)
           })
         }
       })
@@ -262,7 +262,7 @@ $.extend(Network.prototype,
 
       if (self.boot !== null) {
         self.boot()
-        $.extend(Cache.prototype, {boot: null})
+        $.extend(Network.prototype, {boot: null})
       }
 
       self.monitor()
