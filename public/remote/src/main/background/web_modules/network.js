@@ -7,241 +7,267 @@ function Network(chross, config) {
 
   this.config = $.extend(defaultConfig, config)
 
-  this.census = new Census(chross)
-
-  this.moments = ['onBeforeRequest', 'onBeforeSendHeaders', 'onSendHeaders', 'onHeadersReceived', 'onBeforeRedirect', 'onResponseStarted', 'onCompleted', 'onErrorOccurred']
-
-  this.malias = {
-    brq: 'onBeforeRequest',
-    bsh: 'onBeforeSendHeaders',
-    sh: 'onSendHeaders',
-    hr: 'onHeadersReceived',
-    brd: 'onBeforeRedirect',
-    rs: 'onResponseStarted',
-    c: 'onCompleted',
-    eo: 'onErrorOccurred'
-  }
+  this.census = new Census(chross, {
+    moments: this.moments,
+    malias: this.malias
+  })
 
   this.chross = chross
 
   this.init()
 }
 
-$.extend(Network.prototype, {
-  onBeforeRequest: function () {
+var core = {}
+var derivedCoreGroupsByBoot = [
+  'existsAPIs',
+  'getAPIs',
+  'filterAPIs'
+]
+
+core.recordAPIs = {
+  recordInCurrentBVS: function (moment, record, tabId) {
     var self = this
 
-    chrome.webRequest.onBeforeRequest.addListener(function (details) {
-      self.census.cnesusIframe(details)
-
-      self.chross.cache.set(details.tabId, 'onBeforeRequest', {
-        url: details.url,
-        details: details
-      })
-    }, {
-      urls: ["<all_urls>"]
-    })
-  },
-
-  onBeforeSendHeaders: function () {
-    var self = this
-
-    chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
-      self.chross.cache.set(details.tabId, 'onBeforeSendHeaders', {
-        url: details.url,
-        details: details
-      })
-    }, {
-      urls: ["<all_urls>"]
-    })
-  },
-
-  onSendHeaders: function () {
-    var self = this
-    chrome.webRequest.onSendHeaders.addListener(function (details) {
-      self.chross.cache.set(details.tabId, 'onSendHeaders', {
-        url: details.url,
-        details: details
-      })
-    }, {
-      urls: ["<all_urls>"]
-    })
-  },
-
-  onHeadersReceived: function () {
-    var self = this
-    chrome.webRequest.onHeadersReceived.addListener(function (details) {
-      self.chross.cache.set(details.tabId, 'onHeadersReceived', {
-        url: details.url,
-        details: details
-      })
-    }, {
-      urls: ["<all_urls>"]
-    })
-  },
-
-  onBeforeRedirect: function () {
-    var self = this
-
-    chrome.webRequest.onBeforeRedirect.addListener(function (details) {
-      self.chross.cache.set(details.tabId, 'onBeforeRedirect', {
-        url: details.url,
-        details: details
-      })
-    }, {
-      urls: ["<all_urls>"]
-    })
-  },
-
-  onResponseStarted: function () {
-    var self = this
-
-    chrome.webRequest.onResponseStarted.addListener(function (details) {
-      self.chross.cache.set(details.tabId, 'onResponseStarted', {
-        url: details.url,
-        details: details
-      })
-    }, {
-      urls: ["<all_urls>"]
-    })
-  },
-
-  onCompleted: function () {
-    var self = this
-
-    chrome.webRequest.onCompleted.addListener(function (details) {
-      self.chross.cache.set(details.tabId, 'onCompleted', {
-        url: details.url,
-        details: details
-      })
-    }, {
-      urls: ["<all_urls>"]
-    })
-  },
-
-  onErrorOccurred: function () {
-    var self = this
-
-    chrome.webRequest.onErrorOccurred.addListener(function (details) {
-      self.chross.cache.set(details.tabId, 'onErrorOccurred', {
-        url: details.url,
-        details: details
-      })
-    }, {
-      urls: ["<all_urls>"]
-    })
-  },
-
-  get: function (moments, tabId, urlPattern) {
-    var self = this
-    var pattern = new RegExp(urlPattern)
-
-    var details = {
-      msg: ['The details of', urlPattern.toString(), 'occur', moments.join(', '), 'of the lastest view of tab', tabId].join(' '),
-      error: null,
-      data: {}
-    }
-
-    moments.forEach(function (monment) {
-      var records = self.chross.cache.get(tabId, monment)
-
-      if (records.data) {
-        var matches = records.data.filter(function (record) {
-          return pattern.exec(record.url) !== null
-        })
-
-        details.data[monment] = matches
-      }
-      else {
-        if (details.error === null) {
-          details.error = {}
-        }
-        details.error[monment] = records.msg
-
-        details.data[monment] = null
-      }
-    })
-
-    return details
-  },
-
-  getView: function (moments, tabId, viewIndex, urlPattern) {
-    var self = this
-    var pattern = new RegExp(urlPattern)
-
-    var details = {
-      msg: ['The details of', urlPattern.toString(), 'occur', moments.join(', '), 'of the view ranked', viewIndex, 'of tab', tabId].join(' '),
-      error: null,
-      data: {}
-    }
-
-    moments.forEach(function (monment) {
-      var records = self.chross.cache.getInView(tabId, viewIndex, monment)
-
-      if (records.data) {
-        var matches = records.data.filter(function (record) {
-          return pattern.exec(record.url) !== null
-        })
-
-        details.data[monment] = matches
-      }
-      else {
-        if (details.error === null) {
-          details.error = {}
-        }
-        details.error[monment] = records.msg
-
-        details.data[monment] = null
-      }
-    })
-
-    return details
-  },
-
-  boot: function () {
-    var self = this
-
-    self.getOnBeforeRequest = self.get.bind(self, ['onBeforeRequest'])
-    self.getOnBeforeSendHeaders = self.get.bind(self, ['onBeforeSendHeaders'])
-    self.getOnSendHeaders = self.get.bind(self, ['onSendHeaders'])
-    self.getOnHeadersReceived = self.get.bind(self, ['onHeadersReceived'])
-    self.getOnBeforeRedirect = self.get.bind(self, ['onBeforeRedirect'])
-    self.getOnResponseStarted = self.get.bind(self, ['onResponseStarted'])
-    self.getOnCompleted = self.get.bind(self, ['onCompleted'])
-    self.getOnErrorOccurred = self.get.bind(self, ['onErrorOccurred'])
-
-    self.getViewOnBeforeRequest = self.getView.bind(self, ['onBeforeRequest'])
-    self.getViewOnBeforeSendHeaders = self.getView.bind(self, ['onBeforeSendHeaders'])
-    self.getViewOnSendHeaders = self.getView.bind(self, ['onSendHeaders'])
-    self.getViewOnHeadersReceived = self.getView.bind(self, ['onHeadersReceived'])
-    self.getViewOnBeforeRedirect = self.getView.bind(self, ['onBeforeRedirect'])
-    self.getViewOnResponseStarted = self.getView.bind(self, ['onResponseStarted'])
-    self.getViewOnCompleted = self.getView.bind(self, ['onCompleted'])
-    self.getViewOnErrorOccurred = self.getView.bind(self, ['onErrorOccurred'])
-  },
-
-  init: function () {
-    var self = this
-
-    self.boot()
-
-    // 当请求即将发出时
-    self.onBeforeRequest()
-    // 当请求即将发出，初始标头已经准备好时
-    self.onBeforeSendHeaders()
-    // 标头发送至网络前时
-    self.onSendHeaders()
-    // 接收到 HTTP(S) 响应标头时
-    self.onHeadersReceived()
-    // 当重定向即将执行时
-    self.onBeforeRedirect()
-    // 当接收到响应正文的第一个字节时
-    self.onResponseStarted()
-    // 当请求成功处理后
-    self.onCompleted()
-    // 当请求不能成功处理时
-    self.onErrorOccurred()
+    self.chross.cache.recordInCurrentBVS(moment, record, tabId)
   }
-})
+}
+
+core.existsAPIs = {
+  existsInAllBVS: function (moments, tabId) {
+    var self = this
+    var exists = {}
+
+    moments.forEach(function (moment) {
+      var result = self.chross.cache.existsInAllBVS(moment, tabId)
+      exists[moment] = result.data !== null ? result.data : result.msg
+    })
+
+    return exists
+  },
+  existsInCurrentBVS: function (moments, tabId) {
+    var self = this
+    var exists = {}
+
+    moments.forEach(function (moment) {
+      var result = self.chross.cache.existsInCurrentBVS(moment, tabId)
+      exists[moment] = result.data !== null ? result.data : result.msg
+    })
+
+    return exists
+  },
+  existsInSpecificBVS: function (moments, index, tabId) {
+    var self = this
+    var exists = {}
+
+    moments.forEach(function (moment) {
+      var result = self.chross.cache.existsInSpecificBVS(moment, index, tabId)
+      exists[moment] = result.data !== null ? result.data : result.msg
+    })
+
+    return exists
+  }
+}
+
+core.getAPIs = {
+  getInAllBVS: function (moments, tabId) {
+    var self = this
+    var details = {}
+
+    moments.forEach(function (moment) {
+      var result = self.chross.cache.getInAllBVS(moment, tabId)
+      details[moment] = result.data
+    })
+
+    return details
+  },
+  getInCurrentBVS: function (moments, tabId) {
+    var self = this
+    var details = {}
+
+    moments.forEach(function (moment) {
+      var result = self.chross.cache.getInCurrentBVS(moment, tabId)
+      details[moment] = result.data
+    })
+
+    return details
+  },
+  getInSpecificBVS: function (moments, index, tabId) {
+    var self = this
+    var details = {}
+
+    moments.forEach(function (moment) {
+      var result = self.chross.cache.getInSpecificBVS(moment, index, tabId)
+      details[moment] = result.data
+    })
+
+    return details
+  }
+}
+
+core.filterAPIs = {
+  filterInAllBVS: function (moments, pattern, tabId) {
+    var self = this
+    var pattern = new RegExp(pattern)
+    var details = {}
+
+    moments.forEach(function (moment) {
+      var result = self.chross.cache.getInAllBVS(moment, tabId)
+      details[moment] = result.data.map(function (item) {
+        if (item.key === undefined) {
+          return item
+        }
+        else {
+          return {
+            key: item.key,
+            values: item.values.filter(function (value) {
+              return pattern.exec(value.url) !== null
+            })
+          }
+        }
+      })
+    })
+
+    return details
+  },
+  filterInCurrentBVS: function (moments, patterm, tabId) {
+    var self = this
+    var pattern = new RegExp(pattern)
+    var details = {}
+
+    moments.forEach(function (moment) {
+      var result = self.chross.cache.getInCurrentBVS(moment, tabId)
+      details[moment] = result.data.map(function (item) {
+        if (item.key === undefined) {
+          return item
+        }
+        else {
+          return {
+            key: item.key,
+            values: item.values.filter(function (value) {
+              return pattern.exec(value.url) !== null
+            })
+          }
+        }
+      })
+    })
+
+    return details
+  },
+  filterInSpecificBVS: function (moments, patterm, index, tabId) {
+    var self = this
+    var pattern = new RegExp(pattern)
+    var details = {}
+
+    moments.forEach(function (moment) {
+      var result = self.chross.cache.getInSpecificBVS(moment, tabId)
+      details[moment] = result.data.map(function (item) {
+        if (item.key === undefined) {
+          return item
+        }
+        else {
+          return {
+            key: item.key,
+            values: item.values.filter(function (value) {
+              return pattern.exec(value.url) !== null
+            })
+          }
+        }
+      })
+    })
+
+    return details
+  }
+}
+
+$.extend(Network.prototype,
+  {
+    moments: [
+      'onBeforeRequest',  // 当请求即将发出时
+      'onBeforeSendHeaders',   // 当请求即将发出，初始标头已经准备好时
+      'onSendHeaders',  // 标头发送至网络前时
+      'onHeadersReceived',  // 接收到 HTTP(S) 响应标头时
+      'onBeforeRedirect',  // 当重定向即将执行时
+      'onResponseStarted',  // 当接收到响应正文的第一个字节时
+      'onCompleted',  // 当请求成功处理后
+      'onErrorOccurred'  // 当请求不能成功处理时
+    ],
+
+    malias: {
+      brq: 'onBeforeRequest',
+      bsh: 'onBeforeSendHeaders',
+      sh: 'onSendHeaders',
+      hr: 'onHeadersReceived',
+      brd: 'onBeforeRedirect',
+      rs: 'onResponseStarted',
+      c: 'onCompleted',
+      eo: 'onErrorOccurred'
+    },
+
+    monitorRange: {
+      urls: ["<all_urls>"]
+    }
+  },
+  core.recordAPIs,
+  core.existsAPIs,
+  core.getAPIs,
+  core.filterAPIs,
+  // NetWork 全程监听记录的网络请求关键时刻
+  {
+    handler: function (moment, record, tabId) {
+      var self = this
+      
+      self.recordInCurrentBVS(moment, record, tabId)
+      self.census.tasks[moment].forEach(function (task) {
+        task(record.details)
+      })
+    },
+
+    monitor: function () {
+      var self = this
+      var moments = self.moments
+
+      moments.forEach(function (moment) {
+        chrome.webRequest[moment].addListener(function (details) {
+          self.handler(moment, {
+            url: details.url,
+            details: details
+          }, details.tabId)
+        }, self.monitorRange)
+      })
+    }
+  },
+  // Network 的初始化方法
+  {
+    boot: function () {
+      var self = this
+
+      Object.keys(core).forEach(function (group) {
+        if (derivedCoreGroupsByBoot.indexOf(group) > -1) {
+          Object.keys(core[group]).forEach(function (coreAPI) {
+            var derivativeAPIs = {}
+
+            self.moments.forEach(function (moment) {
+              derivativeAPIs[coreAPI + moment] = self[coreAPI].bind(self, [moment])
+            })
+            derivativeAPIs[coreAPI + 'onAllMoments'] = self[coreAPI].bind(self, self.moments)
+
+            $.extend(Cache.prototype, derivativeAPIs)
+          })
+        }
+      })
+    },
+
+    init: function () {
+      var self = this
+
+      if (self.boot !== null) {
+        self.boot()
+        $.extend(Cache.prototype, {boot: null})
+      }
+
+      self.monitor()
+    }
+  }
+)
 
 module.exports = Network

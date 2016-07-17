@@ -9,7 +9,7 @@ function Cache(chross, config) {
   this.tabsMap = {}
 
   // 客户可读可写
-  this.customerTabsMap = {}
+  this.userTabsMap = {}
 
   this.chross = chross
 
@@ -18,6 +18,13 @@ function Cache(chross, config) {
 
 // tabId 设计为APIs最后一个形参的目的：保证只有形参列表完整时才能正确找到tabStore
 var core = {}
+var derivedCoreGroupsByBoot = [
+  'setAPIs',
+  'recordAPIs',
+  'existsAPIs',
+  'getAPIs',
+  'getViewAPIs'
+]
 // map(tabId)的全部viewStore、当前viewStore、指定的viewStore中设置key-value型数据
 core.setAPIs = {
   setInAllVS: function (map, key, value, tabId) {
@@ -435,8 +442,8 @@ $.extend(Cache.prototype,
     },
 
     postfixSpec: {
-      BVC: 'The viewSotre that admins by background, customer is read-only。',
-      CVC: 'The viewStore taht admins by customer himself, customer is readable and writable naturally.'
+      BVS: 'The viewSotre that admins by background, user is read-only。',
+      UVS: 'The viewStore taht admins by user himself, user is readable and writable naturally.'
     }
   },
   core.setAPIs,
@@ -475,24 +482,24 @@ $.extend(Cache.prototype,
       var viewStore = {
         timeStamp: timeStamp
       }
-      var customerViewStore = {
+      var userViewStore = {
         timeStamp: timeStamp
       }
 
       if (isWaiting) {
         viewStore.waiting = true
-        customerViewStore.waiting = true
+        userViewStore.waiting = true
       }
 
       self.tabsMap[tabId] = new Array(viewStore)
-      self.customerTabsMap[tabId] = new Array(customerViewStore)
+      self.userTabsMap[tabId] = new Array(userViewStore)
     },
 
     clearTabStore: function (tabId) {
       var self = this
 
       delete self.tabsMap[tabId]
-      delete self.customerTabsMap[tabId]
+      delete self.userTabsMap[tabId]
     }
   },
   // Cache 监听的三个关键时刻：onBeforeNavigate，onTabCreated，onTabRemoved
@@ -508,8 +515,8 @@ $.extend(Cache.prototype,
         var tabStore = self.tabsMap[tabId]
         var viewStore = tabStore[tabStore.length - 1]
 
-        var customerTabStore = self.customerTabsMap[tabId]
-        var customerViewStore = customerTabStore[customerTabStore.length - 1]
+        var userTabStore = self.userTabsMap[tabId]
+        var userViewStore = userTabStore[userTabStore.length - 1]
 
         self.inspectActiveTab(tabId).then(function (result) {
           if (!result) {
@@ -519,7 +526,7 @@ $.extend(Cache.prototype,
 
           if (viewStore.waiting) {
             delete viewStore.waiting
-            delete customerViewStore.waiting
+            delete userViewStore.waiting
           }
           else {
             self.createViewStore(tabId, false)
@@ -533,12 +540,12 @@ $.extend(Cache.prototype,
 
       chrome.tabs.onCreated.addListener(function (tab) {
         /*
-         * 只要新打开一个标签页，就需要新建tabStore数组和customerTabStore数组
-         * 并且初始化一个viewStore和一个customerViewStore
+         * 只要新打开一个标签页，就需要新建tabStore数组和userTabStore数组
+         * 并且初始化一个viewStore和一个userViewStore
          * waiting = true 表示该store正在等待存储数据
          * delete waiting 后将表示该store已经开始存储数据（避免这种类型的私有数据在用户使用时暴露出去）
          *  一旦创建新的标签页或者使用chross.navigation.urlChange()
-         * 都会创建一个新的viewStore和一个新的customerViewStore（由onTabCreated或者mockTabCreated完成）
+         * 都会创建一个新的viewStore和一个新的userViewStore（由onTabCreated或者mockTabCreated完成）
          * 并设置 waiting = true，保证在之后的 onBeforeNavigate 中不再创建新的store
          * 而是直接启用 waiting = true 的viewStore，并 delete waiting
          * */
@@ -560,19 +567,21 @@ $.extend(Cache.prototype,
       var self = this
 
       Object.keys(core).forEach(function (group) {
-        Object.keys(core[group]).forEach(function (coreAPI) {
-          var description = coreAPI.match(/\b(\w+)(?=VS\b)/g)
+        if (derivedCoreGroupsByBoot.indexOf(group) > -1) {
+          Object.keys(core[group]).forEach(function (coreAPI) {
+            var description = coreAPI.match(/\b(\w+)(?=VS\b)/g)
 
-          if (description && description.length == 1) {
-            description = description.pop()
+            if (description && description.length == 1) {
+              description = description.pop()
 
-            var derivativeAPI = {}
-            derivativeAPI[description + 'BVS'] = self[description + 'VS'].bind(self.tabsMap)
-            derivativeAPI[description + 'CVS'] = self[description + 'VS'].bind(self.customerTabsMap)
+              var derivativeAPIs = {}
+              derivativeAPIs[description + 'BVS'] = self[description + 'VS'].bind(self, 'tabsMap')
+              derivativeAPIs[description + 'UVS'] = self[description + 'VS'].bind(self, 'userTabsMap')
 
-            $.extend(Cache.prototype, derivativeAPI)
-          }
-        })
+              $.extend(Cache.prototype, derivativeAPIs)
+            }
+          })
+        }
       })
     },
 
@@ -581,13 +590,14 @@ $.extend(Cache.prototype,
 
       if (self.boot !== null) {
         self.boot()
-        $.extend(Cache.prototype, {
-          boot: null
-        })
+        $.extend(Cache.prototype, {boot: null})
       }
 
+      // 导航即将开始之前
       self.onBeforeNavigate()
+      // 创建标签页时
       self.onTabCreated()
+      // 关闭标签页时
       self.onTabRemoved()
     }
   }

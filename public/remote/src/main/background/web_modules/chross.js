@@ -20,6 +20,17 @@ function Chross(config) {
   this.userScript = ''
 
   this.urlsList = []
+
+  this.userTasks = {
+    onBeforeRequest: [],
+    onBeforeSendHeaders: [],
+    onSendHeaders: [],
+    onHeadersReceived: [],
+    onBeforeRedirect: [],
+    onResponseStarted: [],
+    onCompleted: [],
+    onErrorOccurred: []
+  }
 }
 
 $.extend(Chross.prototype, {
