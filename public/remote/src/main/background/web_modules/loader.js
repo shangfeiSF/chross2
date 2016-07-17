@@ -36,7 +36,6 @@ $.extend(Loader.prototype, {
           url: self.chross.urlsList[0],
           active: true
         }, function (tab) {
-          console.log(tab)
           var message = '%cGot UserScript and urlsList'
           console.log(message, 'color: #bb1100; font-weight: bold;')
         })

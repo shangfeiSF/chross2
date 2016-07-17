@@ -1,3 +1,5 @@
+var censusCore = require('censusCore')
+
 function Census(chross, config) {
   var config = config || {}
 
@@ -34,48 +36,6 @@ function Census(chross, config) {
   this.init()
 }
 
-var core = {}
-
-core.taskHandlers = {
-  cnesusFrameDetails: function (details) {
-    var self = this
-    var cache = self.chross.cache
-    var tabId = details.tabId
-
-    var needRecord = true
-    var result = cache.getInCurrentBVS('frameList', tabId)
-
-    if (result.key === undefined) {
-      needRecord = true
-    }
-    else {
-      needRecord = result.value.every(function (iframe) {
-        return iframe.frameId != details.frameId
-      })
-    }
-
-    if (needRecord) {
-      cache.setInCurrentBVS('frameIds', details.frameId, tabId)
-
-      cache.setInCurrentBVS('frameList', {
-        frameId: details.frameId,
-        url: details.url,
-        details: details
-      }, tabId)
-    }
-  },
-}
-var executionRegistry = {
-  onBeforeRequest: ['cnesusFrameDetails'],
-  onBeforeSendHeaders: [],
-  onSendHeaders: [],
-  onHeadersReceived: [],
-  onBeforeRedirect: [],
-  onResponseStarted: [],
-  onCompleted: [],
-  onErrorOccurred: []
-}
-
 $.extend(Census.prototype,
   {
     merge: function () {
@@ -98,8 +58,8 @@ $.extend(Census.prototype,
       moments.forEach(function (moment) {
         self.tasks[moment] = new Array()
 
-        executionRegistry[moment].forEach(function (taskName) {
-          self.tasks[moment].push(core.taskHandlers[taskName].bind(self))
+        censusCore.executionRegistry[moment].forEach(function (taskName) {
+          self.tasks[moment].push(censusCore.taskHandlers[taskName].bind(self))
         })
       })
     },

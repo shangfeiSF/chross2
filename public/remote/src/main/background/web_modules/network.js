@@ -1,4 +1,5 @@
 var Census = require('census')
+var networkCore = require('networkCore')
 
 function Network(chross, config) {
   var config = config || {}
@@ -17,169 +18,11 @@ function Network(chross, config) {
   this.init()
 }
 
-var core = {}
-var derivedCoreGroupsByBoot = [
-  'existsAPIs',
-  'getAPIs',
-  'filterAPIs'
-]
-
-core.recordAPIs = {
-  recordInCurrentBVS: function (moment, record, tabId) {
-    var self = this
-
-    self.chross.cache.recordInCurrentBVS(moment, record, tabId)
-  }
-}
-
-core.existsAPIs = {
-  existsInAllBVS: function (moments, tabId) {
-    var self = this
-    var exists = {}
-
-    moments.forEach(function (moment) {
-      var result = self.chross.cache.existsInAllBVS(moment, tabId)
-      exists[moment] = result.data !== null ? result.data : result.msg
-    })
-
-    return exists
-  },
-  existsInCurrentBVS: function (moments, tabId) {
-    var self = this
-    var exists = {}
-
-    moments.forEach(function (moment) {
-      var result = self.chross.cache.existsInCurrentBVS(moment, tabId)
-      exists[moment] = result.data !== null ? result.data : result.msg
-    })
-
-    return exists
-  },
-  existsInSpecificBVS: function (moments, index, tabId) {
-    var self = this
-    var exists = {}
-
-    moments.forEach(function (moment) {
-      var result = self.chross.cache.existsInSpecificBVS(moment, index, tabId)
-      exists[moment] = result.data !== null ? result.data : result.msg
-    })
-
-    return exists
-  }
-}
-
-core.getAPIs = {
-  getInAllBVS: function (moments, tabId) {
-    var self = this
-    var details = {}
-
-    moments.forEach(function (moment) {
-      var result = self.chross.cache.getInAllBVS(moment, tabId)
-      details[moment] = result.data
-    })
-
-    return details
-  },
-  getInCurrentBVS: function (moments, tabId) {
-    var self = this
-    var details = {}
-
-    moments.forEach(function (moment) {
-      var result = self.chross.cache.getInCurrentBVS(moment, tabId)
-      details[moment] = result.data
-    })
-
-    return details
-  },
-  getInSpecificBVS: function (moments, index, tabId) {
-    var self = this
-    var details = {}
-
-    moments.forEach(function (moment) {
-      var result = self.chross.cache.getInSpecificBVS(moment, index, tabId)
-      details[moment] = result.data
-    })
-
-    return details
-  }
-}
-
-core.filterAPIs = {
-  filterInAllBVS: function (moments, pattern, tabId) {
-    var self = this
-    var pattern = new RegExp(pattern)
-    var details = {}
-
-    moments.forEach(function (moment) {
-      var result = self.chross.cache.getInAllBVS(moment, tabId)
-      details[moment] = result.data.map(function (item) {
-        if (item.key === undefined) {
-          return item
-        }
-        else {
-          return {
-            key: item.key,
-            value: item.value.filter(function (value) {
-              return pattern.exec(value.url) !== null
-            })
-          }
-        }
-      })
-    })
-
-    return details
-  },
-  filterInCurrentBVS: function (moments, patterm, tabId) {
-    var self = this
-    var pattern = new RegExp(pattern)
-    var details = {}
-
-    moments.forEach(function (moment) {
-      var result = self.chross.cache.getInCurrentBVS(moment, tabId)
-      details[moment] = result.data.map(function (item) {
-        if (item.key === undefined) {
-          return item
-        }
-        else {
-          return {
-            key: item.key,
-            value: item.value.filter(function (value) {
-              return pattern.exec(value.url) !== null
-            })
-          }
-        }
-      })
-    })
-
-    return details
-  },
-  filterInSpecificBVS: function (moments, patterm, index, tabId) {
-    var self = this
-    var pattern = new RegExp(pattern)
-    var details = {}
-
-    moments.forEach(function (moment) {
-      var result = self.chross.cache.getInSpecificBVS(moment, tabId)
-      details[moment] = result.data.map(function (item) {
-        if (item.key === undefined) {
-          return item
-        }
-        else {
-          return {
-            key: item.key,
-            value: item.value.filter(function (value) {
-              return pattern.exec(value.url) !== null
-            })
-          }
-        }
-      })
-    })
-
-    return details
-  }
-}
-
 $.extend(Network.prototype,
+  networkCore.groups.recordAPIs,
+  networkCore.groups.existsAPIs,
+  networkCore.groups.getAPIs,
+  networkCore.groups.filterAPIs,
   {
     moments: [
       'onBeforeRequest',  // 当请求即将发出时
@@ -207,15 +50,11 @@ $.extend(Network.prototype,
       urls: ["<all_urls>"]
     }
   },
-  core.recordAPIs,
-  core.existsAPIs,
-  core.getAPIs,
-  core.filterAPIs,
   // NetWork 全程监听记录的网络请求关键时刻
   {
     handler: function (moment, record, tabId) {
       var self = this
-      
+
       self.recordInCurrentBVS(moment, record, tabId)
       self.census.tasks[moment].forEach(function (task) {
         task(record.details)
@@ -241,15 +80,15 @@ $.extend(Network.prototype,
     boot: function () {
       var self = this
 
-      Object.keys(core).forEach(function (group) {
-        if (derivedCoreGroupsByBoot.indexOf(group) > -1) {
-          Object.keys(core[group]).forEach(function (coreAPI) {
+      Object.keys(networkCore.groups).forEach(function (group) {
+        if (networkCore.derivedGroups.indexOf(group) > -1) {
+          Object.keys(networkCore.groups[group]).forEach(function (API) {
             var derivativeAPIs = {}
 
             self.moments.forEach(function (moment) {
-              derivativeAPIs[coreAPI + moment] = self[coreAPI].bind(self, [moment])
+              derivativeAPIs[API + moment] = self[API].bind(self, [moment])
             })
-            derivativeAPIs[coreAPI + 'onAllMoments'] = self[coreAPI].bind(self, self.moments)
+            derivativeAPIs[API + 'onAllMoments'] = self[API].bind(self, self.moments)
 
             $.extend(Network.prototype, derivativeAPIs)
           })
