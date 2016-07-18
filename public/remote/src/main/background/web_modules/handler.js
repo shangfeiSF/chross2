@@ -49,19 +49,16 @@ var actions = {
   },
 
   urlChange: function (data, sender) {
-
     var self = this
 
     var defer = $.Deferred()
     var promise = defer.promise()
 
-    var tabId = sender.tab.id
-
-    self.chross.cache.createViewStore(tabId, true)
+    self.chross.cache.createViewStore(sender.tab, true)
 
     defer.resolve({
       type: 'private',
-      content: 'created a new viewStore belongs to the tab with tabId=' + tabId,
+      content: 'created a new viewStore belongs to the tab with tabId=' + sender.tab.id,
       url: data.url,
       sign: data.sign,
       timeStamp: data.timeStamp,

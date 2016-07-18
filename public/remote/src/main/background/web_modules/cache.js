@@ -25,6 +25,8 @@ $.extend(Cache.prototype,
   cacheCore.groups.getAPIs,
   cacheCore.groups.getViewAPIs,
   {
+    protocolPicker: /([\w\-]*)(?=\:\/\/).*/,
+
     msg: {
       noneTabStore: function (tabId) {
         return ['Can not find tabStore by tabId=', tabId].join('')
@@ -76,11 +78,21 @@ $.extend(Cache.prototype,
       return promise
     },
 
-    createTabStore: function (tabId) {
+    createTabStore: function (tab) {
       var self = this
 
-      self.tabsMap[tabId] = new Array()
-      self.userTabsMap[tabId] = new Array()
+      var tabId = tab.id
+      var timeStamp = new Date().toJSON()
+
+      self.tabsMap[tabId] = {
+        timeStamp: timeStamp,
+        viewStores: []
+      }
+
+      self.userTabsMap[tabId] = {
+        timeStamp: timeStamp,
+        viewStores: []
+      }
     },
 
     clearTabStore: function (tabId) {
@@ -90,8 +102,12 @@ $.extend(Cache.prototype,
       delete self.userTabsMap[tabId]
     },
 
-    createViewStore: function (tabId, isWaiting) {
+    createViewStore: function (tab, isWaiting) {
       var self = this
+
+      var tabId = tab.id
+      var url = tab.url
+      var protocol = self.protocolPicker.exec(url).pop()
 
       var tabStore = self.tabsMap[tabId]
       var userTabStore = self.userTabsMap[tabId]
@@ -99,9 +115,13 @@ $.extend(Cache.prototype,
       var timeStamp = new Date().toJSON()
 
       var viewStore = {
+        url: url,
+        protocol: protocol,
         timeStamp: timeStamp
       }
       var userViewStore = {
+        url: url,
+        protocol: protocol,
         timeStamp: timeStamp
       }
 
@@ -110,8 +130,8 @@ $.extend(Cache.prototype,
         userViewStore.waiting = true
       }
 
-      tabStore.push(viewStore)
-      userTabStore.push(userViewStore)
+      tabStore.viewStores.push(viewStore)
+      userTabStore.viewStores.push(userViewStore)
     },
 
     recordTabStore: function (tabId) {
@@ -156,10 +176,10 @@ $.extend(Cache.prototype,
 
         // tabStore一定存在，因为 onTabCreated 先于 onBeforeNavigate 触发
         var tabStore = self.tabsMap[tabId]
-        var viewStore = tabStore[tabStore.length - 1]
+        var viewStore = tabStore.viewStores[tabStore.viewStores.length - 1]
 
         var userTabStore = self.userTabsMap[tabId]
-        var userViewStore = userTabStore[userTabStore.length - 1]
+        var userViewStore = userTabStore.viewStores[userTabStore.viewStores.length - 1]
 
         self.inspectActiveTab(tabId).then(function (result) {
           if (!result) {
@@ -172,7 +192,10 @@ $.extend(Cache.prototype,
             delete userViewStore.waiting
           }
           else {
-            self.createViewStore(tabId, false)
+            self.createViewStore({
+              id: tabId,
+              url: details.url
+            }, false)
           }
         })
       })
@@ -192,8 +215,8 @@ $.extend(Cache.prototype,
          * 并设置 waiting = true，保证在之后的 onBeforeNavigate 中不再创建新的store
          * 而是直接启用 waiting = true 的viewStore，并 delete waiting
          * */
-        self.createTabStore(tab.id)
-        self.createViewStore(tab.id, true)
+        self.createTabStore(tab)
+        self.createViewStore(tab, true)
       })
     },
 

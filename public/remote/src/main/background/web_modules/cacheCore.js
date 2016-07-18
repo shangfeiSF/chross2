@@ -7,7 +7,7 @@ module.exports = {
     'getAPIs',
     'getViewAPIs'
   ],
-  
+
   groups: {
     // map(tabId)的allViewStore、currentViewStore、specificViewStore中设置key-value型数据
     setAPIs: {
@@ -21,18 +21,18 @@ module.exports = {
           data: null
         }
 
-        if (!tabStore.length) return {
+        if (!tabStore.viewStores.length) return {
           msg: self.msg.noneViewStore('all', tabId),
           data: null
         }
 
-        tabStore.forEach(function (viewStore) {
+        tabStore.viewStores.forEach(function (viewStore) {
           viewStore[key] = value
         })
 
         return {
           msg: 'success',
-          data: tabStore
+          data: tabStore.viewStores
         }
       },
       setInCurrentVS: function (map, key, value, tabId) {
@@ -45,7 +45,7 @@ module.exports = {
           data: null
         }
 
-        var currentVS = tabStore[tabStore.length - 1]
+        var currentVS = tabStore.viewStores[tabStore.viewStores.length - 1]
         if (!currentVS) return {
           msg: self.msg.noneViewStore('current', tabId)
         }
@@ -67,7 +67,7 @@ module.exports = {
           data: null
         }
 
-        var specificVS = tabStore[index]
+        var specificVS = tabStore.viewStores[index]
         if (!specificVS) return {
           msg: self.msg.noneViewStore(index, tabId),
           data: null
@@ -93,19 +93,19 @@ module.exports = {
           data: null
         }
 
-        if (!tabStore.length) return {
+        if (!tabStore.viewStores.length) return {
           msg: self.msg.noneViewStore('all', tabId),
           data: null
         }
 
-        tabStore.forEach(function (viewStore) {
+        tabStore.viewStores.forEach(function (viewStore) {
           !viewStore.hasOwnProperty(library) && (viewStore[library] = new Array())
           viewStore[library].push(record)
         })
 
         return {
           msg: 'success',
-          data: tabStore
+          data: tabStore.viewStores
         }
       },
       recordInCurrentVS: function (map, library, record, tabId) {
@@ -118,7 +118,7 @@ module.exports = {
           data: null
         }
 
-        var currentVS = tabStore[tabStore.length - 1]
+        var currentVS = tabStore.viewStores[tabStore.viewStores.length - 1]
         if (!currentVS) return {
           msg: self.msg.noneViewStore('current', tabId)
         }
@@ -141,7 +141,7 @@ module.exports = {
           data: null
         }
 
-        var specificVS = tabStore[index]
+        var specificVS = tabStore.viewStores[index]
         if (!specificVS) return {
           msg: self.msg.noneViewStore(index, tabId),
           data: null
@@ -168,12 +168,12 @@ module.exports = {
           data: null
         }
 
-        if (!tabStore.length) return {
+        if (!tabStore.viewStores.length) return {
           msg: self.msg.noneViewStore('all', tabId),
           data: null
         }
 
-        var exists = tabStore.map(function (viewStore) {
+        var exists = tabStore.viewStores.map(function (viewStore) {
           return viewStore.hasOwnProperty(prop)
         })
 
@@ -192,7 +192,7 @@ module.exports = {
           data: null
         }
 
-        var currentVS = tabStore[tabStore.length - 1]
+        var currentVS = tabStore.viewStores[tabStore.viewStores.length - 1]
         if (!currentVS) return {
           msg: self.msg.noneViewStore('current', tabId)
         }
@@ -214,7 +214,7 @@ module.exports = {
           data: null
         }
 
-        var specificVS = tabStore[index]
+        var specificVS = tabStore.viewStores[index]
         if (!specificVS) return {
           msg: self.msg.noneViewStore(index, tabId),
           data: null
@@ -240,12 +240,12 @@ module.exports = {
           data: null
         }
 
-        if (!tabStore.length) return {
+        if (!tabStore.viewStores.length) return {
           msg: self.msg.noneViewStore('all', tabId),
           data: null
         }
 
-        var result = tabStore.map(function (viewStore) {
+        var result = tabStore.viewStores.map(function (viewStore) {
           if (viewStore.hasOwnProperty(key)) {
             return {
               key: key,
@@ -275,7 +275,7 @@ module.exports = {
           data: null
         }
 
-        var currentVS = tabStore[tabStore.length - 1]
+        var currentVS = tabStore.viewStores[tabStore.viewStores.length - 1]
         if (!currentVS) return {
           msg: self.msg.noneViewStore('current', tabId)
         }
@@ -306,7 +306,7 @@ module.exports = {
           data: null
         }
 
-        var specificVS = tabStore[index]
+        var specificVS = tabStore.viewStores[index]
         if (!specificVS) return {
           msg: self.msg.noneViewStore(index, tabId),
           data: null
@@ -341,14 +341,14 @@ module.exports = {
           data: null
         }
 
-        if (!tabStore.length) return {
+        if (!tabStore.viewStores.length) return {
           msg: self.msg.noneViewStore('all', tabId),
           data: null
         }
 
         return {
           msg: 'success',
-          data: tabStore
+          data: tabStore.viewStores
         }
       },
       getCurrentVS: function (map, tabId) {
@@ -361,7 +361,7 @@ module.exports = {
           data: null
         }
 
-        var currentVS = tabStore[tabStore.length - 1]
+        var currentVS = tabStore.viewStores[tabStore.viewStores.length - 1]
         if (!currentVS) return {
           msg: self.msg.noneViewStore('current', tabId)
         }
@@ -381,7 +381,7 @@ module.exports = {
           data: null
         }
 
-        var specificVS = tabStore[index]
+        var specificVS = tabStore.viewStores[index]
         if (!specificVS) return {
           msg: self.msg.noneViewStore(index, tabId),
           data: null
