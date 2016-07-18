@@ -38,14 +38,14 @@ var config = {
   dirs: {
     publicDir: '../public',
     remoteDir: '../public/remote/build',
-    testDir: './test',
+    webSiteDir: './webSite',
     tabStoreDir: './tabStore'
   }
 }
 
 app.use(express.static(path.join(__dirname, config.dirs.remoteDir)))
 app.use(express.static(path.join(__dirname, config.dirs.publicDir)))
-app.use(express.static(path.join(__dirname, config.dirs.testDir)))
+app.use(express.static(path.join(__dirname, config.dirs.webSiteDir)))
 app.use(config.virtualRoutes.getTabStore, express.static(path.join(__dirname, config.dirs.tabStoreDir)))
 
 app.post('/recordTabStore', function (req, res) {
