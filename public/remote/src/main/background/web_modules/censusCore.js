@@ -17,7 +17,12 @@ module.exports = {
       var tabId = details.tabId
 
       var needRecord = true
-      var result = cache.getInCurrentBVS('frameList', tabId)
+      var result = cache.getInCurrentBVS('frameList', tabId).data
+
+      if (result.data === null) {
+        console.error(result.msg)
+        return false
+      }
 
       if (result.key === undefined) {
         needRecord = true
@@ -29,9 +34,9 @@ module.exports = {
       }
 
       if (needRecord) {
-        cache.setInCurrentBVS('frameIds', details.frameId, tabId)
+        cache.recordInCurrentBVS('frameIds', details.frameId, tabId)
 
-        cache.setInCurrentBVS('frameList', {
+        cache.recordInCurrentBVS('frameList', {
           frameId: details.frameId,
           url: details.url,
           details: details

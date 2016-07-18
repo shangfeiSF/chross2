@@ -20,10 +20,10 @@ chross.probe.runCodeInIframe(function () {
 })
 
 setTimeout(function () {
-  chross.navigation.urlChange('http://www.sina.com.cn/')
+  chross.navigation.urlChange('http://localhost/entry.html')
     .then(function (result) {
       if (result.allow) {
         window.location.href = result.url
       }
     })
-}, 10000)
+}, 6000)

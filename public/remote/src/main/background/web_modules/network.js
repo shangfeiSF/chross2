@@ -67,10 +67,13 @@ $.extend(Network.prototype,
 
       moments.forEach(function (moment) {
         chrome.webRequest[moment].addListener(function (details) {
-          self.handler(moment, {
-            url: details.url,
-            details: details
-          }, details.tabId)
+          // 监听chross设置的crossIframeURL，减少对原始页面network统计的影响
+          if (self.config.monitorFilter.exec(details.url) === null && details.tabId > -1) {
+            self.handler(moment, {
+              url: details.url,
+              details: details
+            }, details.tabId)
+          }
         }, self.monitorRange)
       })
     }
@@ -79,6 +82,8 @@ $.extend(Network.prototype,
   {
     boot: function () {
       var self = this
+
+      self.config.monitorFilter = new RegExp(self.chross.config.crossIframeURL)
 
       Object.keys(networkCore.groups).forEach(function (group) {
         if (networkCore.derivedGroups.indexOf(group) > -1) {

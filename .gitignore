@@ -1,5 +1,6 @@
 .idea/
 public/extension/build
 public/remote/build
+server/tabStore/
 node_modules/
 npm-debug.log

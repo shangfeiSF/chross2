@@ -112,6 +112,37 @@ $.extend(Cache.prototype,
 
       tabStore.push(viewStore)
       userTabStore.push(userViewStore)
+    },
+
+    recordTabStore: function (tabId) {
+      var self = this
+
+      var defer = $.Deferred()
+      var promise = defer.promise()
+
+      var tabStore = self.tabsMap[tabId]
+      tabStore = JSON.stringify(tabStore)
+
+      var formData = new FormData()
+      formData.append('tabStore', tabStore)
+
+      var ajaxConfig = {
+        type: 'post',
+        url: 'http://localhost/recordTabStore',
+        processData: false,
+        contentType: false,
+        data: formData,
+      }
+
+      $.when($.ajax(ajaxConfig))
+        .done(function (result) {
+          defer.resolve(result.status == 200)
+        })
+        .fail(function () {
+          defer.resolve(false)
+        })
+
+      return promise
     }
   },
   // Cache 监听的三个关键时刻：onBeforeNavigate，onTabCreated，onTabRemoved
@@ -170,7 +201,10 @@ $.extend(Cache.prototype,
       var self = this
 
       chrome.tabs.onRemoved.addListener(function (tabId) {
-        self.clearTabStore(tabId)
+        self.recordTabStore(tabId)
+          .then(function (status) {
+            status && self.clearTabStore(tabId)
+          })
       })
     }
   },
