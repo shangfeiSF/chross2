@@ -46,6 +46,8 @@ $.extend(Network.prototype,
       eo: 'onErrorOccurred'
     },
 
+    monitorFilter: '',
+
     monitorRange: {
       urls: ["<all_urls>"]
     }

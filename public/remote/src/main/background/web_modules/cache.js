@@ -206,12 +206,12 @@ $.extend(Cache.prototype,
 
       chrome.tabs.onCreated.addListener(function (tab) {
         /*
-         * 只要新打开一个标签页，就需要新建tabStore数组和userTabStore数组
-         * 并且初始化一个viewStore和一个userViewStore
+         * 只要新打开一个标签页，就需要新建tabStore对象和userTabStore对象
+         * 并且初始化一个viewStores数组和一个userViewStores数组（打上时间戳timeStamp）
          * waiting = true 表示该store正在等待存储数据
          * delete waiting 后将表示该store已经开始存储数据（避免这种类型的私有数据在用户使用时暴露出去）
          *  一旦创建新的标签页或者使用chross.navigation.urlChange()
-         * 都会创建一个新的viewStore和一个新的userViewStore（由onTabCreated或者mockTabCreated完成）
+         * 都会创建一个新的viewStore和一个新的userViewStore（由onTabCreated或者createViewStore完成）
          * 并设置 waiting = true，保证在之后的 onBeforeNavigate 中不再创建新的store
          * 而是直接启用 waiting = true 的viewStore，并 delete waiting
          * */
