@@ -14,8 +14,8 @@ module.exports = {
     var app = main.app
     var rootDir = main.rootDir
 
-    app.use(express.static(path.join(rootDir, config.dirs.remoteDir)))
     app.use(express.static(path.join(rootDir, config.dirs.publicDir)))
+    app.use(express.static(path.join(rootDir, config.dirs.remoteDir)))
     app.use(express.static(path.join(rootDir, config.dirs.webSiteDir)))
   }
 }

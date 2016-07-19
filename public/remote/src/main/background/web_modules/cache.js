@@ -263,12 +263,15 @@ $.extend(Cache.prototype,
         $.extend(Cache.prototype, {boot: null})
       }
 
-      // 导航即将开始之前
-      self.onBeforeNavigate()
-      // 创建标签页时
-      self.onTabCreated()
-      // 关闭标签页时
-      self.onTabRemoved()
+      // 这样可以避免在本地单元测试时启动background才有的监听时刻
+      if (self.chross) {
+        // 导航即将开始之前
+        self.onBeforeNavigate()
+        // 创建标签页时
+        self.onTabCreated()
+        // 关闭标签页时
+        self.onTabRemoved()
+      }
     }
   }
 )

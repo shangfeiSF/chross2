@@ -111,7 +111,10 @@ $.extend(Network.prototype,
         $.extend(Network.prototype, {boot: null})
       }
 
-      self.monitor()
+      // 这样可以避免在本地单元测试时启动background才有的监听时刻
+      if (self.chross) {
+        self.monitor()
+      }
     }
   }
 )
