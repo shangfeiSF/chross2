@@ -4,6 +4,13 @@
 var path = require('path')
 var cp = require('child_process')
 
+var GruntFileName = '_remote.test.gruntfile.js'
+var gruntCommand = [
+  'grunt',
+  '--gruntfile',
+  GruntFileName
+].join(' ')
+
 var webpackFileName = '_remote.test.webpack.js'
 var webpackCommand = [
   'webpack',
@@ -11,11 +18,36 @@ var webpackCommand = [
   webpackFileName
 ].join(' ')
 
-cp.exec(webpackCommand, {cwd: process.cwd()}, function (error, stdout, stderr) {
+var clean = [
+  'grunt',
+  'clean',
+  '--gruntfile',
+  GruntFileName
+].join(' ')
+
+cp.exec(gruntCommand, {cwd: process.cwd()}, function (error, stdout, stderr) {
   if (error) {
     console.error('exec error:' + error)
   } else {
     console.log(stdout)
     console.log(stderr)
+
+    cp.exec(webpackCommand, {cwd: process.cwd()}, function (error, stdout, stderr) {
+      if (error) {
+        console.error('exec error:' + error)
+      } else {
+        console.log(stdout)
+        console.log(stderr)
+
+        cp.exec(clean, {cwd: process.cwd()}, function (error, stdout, stderr) {
+          if (error) {
+            console.error('exec error:' + error)
+          } else {
+            console.log(stdout)
+            console.log(stderr)
+          }
+        })
+      }
+    })
   }
 })

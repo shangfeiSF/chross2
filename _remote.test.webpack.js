@@ -4,32 +4,40 @@ var path = require('path')
 var webpack = require('webpack')
 
 var config = {
-  sourceDir: './public/remote/src/main',
-  destinationDir: './public/remote/src/test',
-  unit: './unit',
+  sourceDir: './test/remote/src/main',
+  destinationDir: './test/remote/build/main',
   outputFileName: '[name].bundle.js',
 }
 
-var modules = require('./_remote.test.config.js')
-
-function makeEntry(modules) {
+function makeEntry(config) {
+  var sourceDir = config.sourceDir
   var entry = {}
-  var modules = modules
 
-  Object.keys(modules).forEach(function (name) {
-    var module = modules[name]
+  fs.readdirSync(sourceDir)
+    .filter(function (file) {
+      return fs.statSync(path.join(sourceDir, file)).isDirectory()
+    })
+    .forEach(function (dir) {
+      var dir = dir
 
-    var key = path.join(config.unit, module.belongsto, 'node_modules', name)
-    entry[key] = [config.sourceDir, module.path].join('/')
-  })
+      fs.readdirSync(path.join(sourceDir, dir))
+        .forEach(function (file) {
+          if (!fs.statSync(path.join(sourceDir, dir, file)).isDirectory()) {
+            var basename = path.basename(file, '.test.js')
+            var moduleName = path.basename(file, '.js')
+
+            var key = path.join(dir, basename)
+
+            entry[key] = [sourceDir, dir, moduleName].join('/')
+          }
+        })
+    })
 
   return entry
 }
 
-console.log(JSON.stringify(makeEntry(modules), null, 2))
-
 module.exports = {
-  entry: makeEntry(modules),
+  entry: makeEntry(config),
 
   output: {
     path: config.destinationDir,
