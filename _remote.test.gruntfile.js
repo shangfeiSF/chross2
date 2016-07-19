@@ -53,7 +53,7 @@ function makeClean(config) {
     .forEach(function (dir) {
       result.clean.push(path.join(destinationDir, dir, modulesDir))
     })
-  
+
   return result
 }
 

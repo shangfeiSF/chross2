@@ -1,93 +1,25 @@
 #!/usr/bin/env node
 'use strict'
-
-var fs = require('fs')
-var path = require('path')
-
-var colors = require('colors')
-var Promise = require("bluebird")
-
 var express = require('express')
-var multiparty = require('multiparty')
-var bodyParser = require('body-parser')
 
-var Hash = require('./hash')
-
-Promise.promisifyAll(fs)
-
-var hash = new Hash({
-  algorithms: 'RSA-SHA1-2',
-  encoding: 'hex'
-})
+var assets = require('./modules/assets')
+var upload = require('./modules/upload')
+var test = require('./modules/test')
 
 var app = express()
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({
-  extended: true
-}))
-
-var config = {
-  host: 'http://localhost',
-  port: 80,
-
-  virtualRoutes: {
-    getTabStore: '/getTabStore',
-  },
-
-  dirs: {
-    publicDir: '../public',
-    remoteDir: '../public/remote/build',
-    webSiteDir: './webSite',
-    tabStoreDir: './tabStore'
-  }
+var main = {
+  app: app,
+  rootDir: __dirname
 }
 
-app.use(express.static(path.join(__dirname, config.dirs.remoteDir)))
-app.use(express.static(path.join(__dirname, config.dirs.publicDir)))
-app.use(express.static(path.join(__dirname, config.dirs.webSiteDir)))
-app.use(config.virtualRoutes.getTabStore, express.static(path.join(__dirname, config.dirs.tabStoreDir)))
+// 启动静态资源访问服务
+assets.start(main)
+// 启动上传服务
+upload.start(main)
+// 启动模块测试服务
+test.start(main)
 
-app.post('/recordTabStore', function (req, res) {
-  var form = new multiparty.Form({
-    'uploadDir': config.dirs.tabStoreDir
-  })
-  /* promisify the form.parse */
-  var parseAsync = Promise.promisify(form.parse, {
-    context: form,
-    multiArgs: true
-  })
-
-  parseAsync(req)
-    .then(function (result) {
-      var tabStore = JSON.parse(result.shift()['tabStore'].pop())
-
-      return {
-        path: path.join(__dirname, config.dirs.tabStoreDir),
-        name: [hash.gen(), 'json'].join('.'),
-        content: JSON.stringify({
-          "tabStore": tabStore
-        }, null, 2),
-        encode: 'utf8'
-      }
-    })
-    .then(function (file) {
-      return fs.writeFileAsync(path.join(file.path, file.name), file.content, file.encode)
-    })
-    .then(function () {
-      res.send({
-        status: 200,
-        msg: 'ok'
-      })
-    })
-    .catch(function (error) {
-      res.send({
-        status: 500,
-        msg: error
-      })
-    })
-})
-
-app.listen(config.port, function () {
-  console.log('[Server] -- listening localhost:8080....'.green)
+app.listen(80, function () {
+  console.log('[Server] -- listening localhost:80....'.green)
 })
