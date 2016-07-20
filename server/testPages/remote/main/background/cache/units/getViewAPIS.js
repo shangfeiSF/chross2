@@ -1,10 +1,11 @@
 $.extend(Suite.prototype, {
-  testGetViewAPIs: function (cache, reset) {
+  testGetViewAPIs_BVS: function (cache, reset) {
     var self = this
+
     var tabId = self.config.mockData.tabId
+    var allViewStores = self.config.mockData.tabStore.viewStores
 
     QUnit.test("getAllBVS：获取全部的backgroundViewStore", function (assert) {
-      var allViewStores = self.config.mockData.tabStore.viewStores
       var result = cache.getAllBVS(tabId)
 
       var msg = ['Passed：', '获取全部的backgroundViewStore'].join('')
@@ -15,7 +16,6 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("getCurrentBVS：获取当前的backgroundViewStore", function (assert) {
-      var allViewStores = self.config.mockData.tabStore.viewStores
       var result = cache.getCurrentBVS(tabId)
 
       var msg = ['Passed：', '获取当前的backgroundViewStore'].join('')
@@ -26,7 +26,6 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("getSpecificBVS：获取指定的backgroundViewStore", function (assert) {
-      var allViewStores = self.config.mockData.tabStore.viewStores
       var specificIndex = 3
       var result = cache.getSpecificBVS(specificIndex, tabId)
 
@@ -34,6 +33,46 @@ $.extend(Suite.prototype, {
       assert.notStrictEqual(result.data, null, msg)
 
       var msg = ['Passed：', '检查指定的backgroundViewStore[', specificIndex, ']'].join('')
+      assert.deepEqual(result.data, allViewStores[specificIndex], msg)
+    })
+
+    reset && reset()
+  },
+
+  testGetViewAPIs_UVS: function (cache, reset) {
+    var self = this
+
+    var tabId = self.config.mockData.tabId
+    var allViewStores = self.config.mockData.userTabsMap.viewStores
+
+    QUnit.test("getAllUVS：获取全部的userViewStore", function (assert) {
+      var result = cache.getAllUVS(tabId)
+
+      var msg = ['Passed：', '获取全部的userViewStore'].join('')
+      assert.notStrictEqual(result.data, null, msg)
+
+      var msg = ['Passed：', '检查全部的userViewStore'].join('')
+      assert.deepEqual(result.data, allViewStores, msg)
+    })
+
+    QUnit.test("getCurrentUVS：获取当前的userViewStore", function (assert) {
+      var result = cache.getCurrentUVS(tabId)
+
+      var msg = ['Passed：', '获取当前的userViewStore'].join('')
+      assert.notStrictEqual(result.data, null, msg)
+
+      var msg = ['Passed：', '检查当前的userViewStore'].join('')
+      assert.deepEqual(result.data, allViewStores[allViewStores.length - 1], msg)
+    })
+
+    QUnit.test("getSpecificUVS：获取指定的userViewStore", function (assert) {
+      var specificIndex = 3
+      var result = cache.getSpecificUVS(specificIndex, tabId)
+
+      var msg = ['Passed：', '获取指定的userViewStore[', specificIndex, ']'].join('')
+      assert.notStrictEqual(result.data, null, msg)
+
+      var msg = ['Passed：', '检查指定的userViewStore[', specificIndex, ']'].join('')
       assert.deepEqual(result.data, allViewStores[specificIndex], msg)
     })
 
