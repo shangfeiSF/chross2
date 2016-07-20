@@ -1,6 +1,7 @@
 $.extend(Suite.prototype, {
-  testRecordAPIs_BVS: function (cache, reset) {
+  testRecordAPIs_BVS: function () {
     var self = this
+    var cache = self.cache
 
     var tabId = self.config.mockData.tabId
     var viewStores = cache.tabsMap[tabId].viewStores
@@ -105,12 +106,13 @@ $.extend(Suite.prototype, {
         }
       })
     })
-
-    reset && reset()
+    
+    self.reset()
   },
 
-  testRecordAPIs_UVS: function (cache, reset) {
+  testRecordAPIs_UVS: function () {
     var self = this
+    var cache = self.cache
 
     var tabId = self.config.mockData.tabId
     var viewStores = cache.userTabsMap[tabId].viewStores
@@ -216,6 +218,6 @@ $.extend(Suite.prototype, {
       })
     })
 
-    reset && reset()
+    self.reset()
   }
 })

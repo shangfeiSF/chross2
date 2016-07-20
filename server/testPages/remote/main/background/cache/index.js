@@ -1,80 +1,73 @@
-$.when($.ajax({
+$.when(
+  $.ajax({
     type: 'GET',
-    url: './data.json',
+    url: './tabStore.json',
     dataType: 'json'
-  }))
-  .done(function (data) {
+  }),
+  $.ajax({
+    type: 'GET',
+    url: './userTabStore.json',
+    dataType: 'json'
+  })
+  )
+  .done(function (data1, data2) {
+    // 构造mock数据
     var mockData = {
-      chross: undefined,
+      chross: undefined,  // 避免chross的模块调用chross的方法
       tabId: 123,
-      tabStore: data.tabStore,
-      userTabsMap: {
-        timeStamp: new Date().toJSON(),
-        viewStores: [
-          {
-            userName: 'shangfei',
-            userType: ['admin', 'developer'],
-            userId: 73812,
-            userInfo: {
-              floor: 17,
-              seat: 158,
-              tel: ''
-            },
-            timeStamp: new Date().toJSON(),
-          },
-          {
-            userName: 'xiaoshao',
-            userType: ['guest', 'developer'],
-            timeStamp: new Date().toJSON(),
-          },
-          {
-            userId: null,
-            userInfo: {
-              tel: ''
-            },
-            timeStamp: new Date().toJSON(),
-          },
-          {
-            userName: '',
-            userId: null,
-            timeStamp: new Date().toJSON(),
-          },
-          {
-            userInfo: {
-              tel: '18612697399'
-            },
-            timeStamp: new Date().toJSON(),
-          },
-        ]
-      }
+      tabStore: data1[0].tabStore,
+      userTabsMap: data2[0].userTabStore
     }
 
-    var cache = new window.Cache(mockData.chross)
-    cache.tabsMap[mockData.tabId] = $.extend({}, mockData.tabStore)
-    cache.userTabsMap[mockData.tabId] = $.extend({}, mockData.userTabsMap)
-
+    // 配置测试套件（模块，数据）
     var suite = new Suite({
-      mockData: mockData
+      module: window.Cache,  // 传入测试模块
+      mockData: mockData  // 传入测试mock数据
     })
-    var reset = function () {
-      cache.tabsMap[mockData.tabId] = $.extend({}, mockData.tabStore)
-      cache.userTabsMap[mockData.tabId] = $.extend({}, mockData.userTabsMap)
-    }
 
-    suite.testSetAPIs_BVS(cache, reset)
-    suite.testSetAPIs_UVS(cache, reset)
+    // 初始化测试套件
+    suite.init(function () {
+      var self = this
 
-    suite.testRecordAPIs_BVS(cache, reset)
-    suite.testRecordAPIs_UVS(cache, reset)
+      var config = self.config
+      var mockData = config.mockData
+      var tabId = mockData.tabId
 
-    suite.testExiistsAPIs_BVS(cache, reset)
-    suite.testExiistsAPIs_UVS(cache, reset)
+      // 生成测试模块的实例
+      self.cache = new config.module(mockData.chross)
+      // 载入mock数据
+      self.cache.tabsMap[tabId] = $.extend({}, mockData.tabStore)
+      self.cache.userTabsMap[tabId] = $.extend({}, mockData.userTabsMap)
 
-    suite.testGetAPIs_BVS(cache, reset)
-    suite.testGetAPIs_UVS(cache, reset)
+      // 配置单元测试辅助方法
+      this.reset = function () {
+        var self = this
 
-    suite.testGetViewAPIs_BVS(cache, reset)
-    suite.testGetViewAPIs_UVS(cache, reset)
+        var config = self.config
+        var mockData = config.mockData
+        var tabId = mockData.tabId
+
+        self.cache.tabsMap[tabId] = $.extend({}, mockData.tabStore)
+        self.cache.userTabsMap[tabId] = $.extend({}, mockData.userTabsMap)
+      }
+    })
+
+    // 执行测试用例集合
+    suite.testSetAPIs_BVS()
+    suite.testSetAPIs_UVS()
+
+    suite.testRecordAPIs_BVS()
+    suite.testRecordAPIs_UVS()
+
+    suite.testExiistsAPIs_BVS()
+    suite.testExiistsAPIs_UVS()
+
+    suite.testGetAPIs_BVS()
+    suite.testGetAPIs_UVS()
+
+    suite.testGetViewAPIs_BVS()
+    suite.testGetViewAPIs_UVS()
   })
   .fail(function () {
+    alert('请检查本地单元测试服务是否启动！')
   })

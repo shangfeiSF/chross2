@@ -5,3 +5,11 @@ function Suite(config) {
 
   this.config = $.extend(defaultConfig, config)
 }
+
+$.extend(Suite.prototype, {
+  init: function (boot) {
+    var self = this
+
+    boot.bind(self)()
+  }
+})

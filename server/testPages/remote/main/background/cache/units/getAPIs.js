@@ -1,6 +1,8 @@
 $.extend(Suite.prototype, {
-  testGetAPIs_BVS: function (cache, reset) {
+  testGetAPIs_BVS: function () {
     var self = this
+    var cache = self.cache
+
     var tabId = self.config.mockData.tabId
 
     QUnit.test("getInAllBVS：在全部的backgroundViewStore中获取某一属性的值", function (assert) {
@@ -100,11 +102,13 @@ $.extend(Suite.prototype, {
       assert.deepEqual(result.data, expected, msg)
     })
 
-    reset && reset()
+    self.reset()
   },
 
-  testGetAPIs_UVS: function (cache, reset) {
+  testGetAPIs_UVS: function () {
     var self = this
+    var cache = self.cache
+
     var tabId = self.config.mockData.tabId
 
     QUnit.test("getInAllUVS：在全部的userViewStore中获取某一属性的值", function (assert) {
@@ -230,6 +234,6 @@ $.extend(Suite.prototype, {
       assert.deepEqual(result.data, expected, msg)
     })
 
-    reset && reset()
+    self.reset()
   }
 })

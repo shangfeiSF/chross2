@@ -1,6 +1,8 @@
 $.extend(Suite.prototype, {
-  testExiistsAPIs_BVS: function (cache, reset) {
+  testExiistsAPIs_BVS: function () {
     var self = this
+    var cache = self.cache
+
     var tabId = self.config.mockData.tabId
 
     QUnit.test("existsInAllBVS：在全部的backgroundViewStore中检查某一属性是否存在", function (assert) {
@@ -42,11 +44,13 @@ $.extend(Suite.prototype, {
       assert.strictEqual(result.data, false, msg)
     })
 
-    reset && reset()
+    self.reset()
   },
 
-  testExiistsAPIs_UVS: function (cache, reset) {
+  testExiistsAPIs_UVS: function () {
     var self = this
+    var cache = self.cache
+
     var tabId = self.config.mockData.tabId
 
     QUnit.test("existsInAllUVS：在全部的userViewStore中检查某一属性是否存在", function (assert) {
@@ -89,6 +93,6 @@ $.extend(Suite.prototype, {
       assert.strictEqual(result.data, false, msg)
     })
 
-    reset && reset()
+    self.reset()
   }
 })

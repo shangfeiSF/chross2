@@ -1,6 +1,7 @@
 $.extend(Suite.prototype, {
-  testGetViewAPIs_BVS: function (cache, reset) {
+  testGetViewAPIs_BVS: function () {
     var self = this
+    var cache = self.cache
 
     var tabId = self.config.mockData.tabId
     var allViewStores = self.config.mockData.tabStore.viewStores
@@ -36,11 +37,12 @@ $.extend(Suite.prototype, {
       assert.deepEqual(result.data, allViewStores[specificIndex], msg)
     })
 
-    reset && reset()
+    self.reset()
   },
 
-  testGetViewAPIs_UVS: function (cache, reset) {
+  testGetViewAPIs_UVS: function () {
     var self = this
+    var cache = self.cache
 
     var tabId = self.config.mockData.tabId
     var allViewStores = self.config.mockData.userTabsMap.viewStores
@@ -76,6 +78,6 @@ $.extend(Suite.prototype, {
       assert.deepEqual(result.data, allViewStores[specificIndex], msg)
     })
 
-    reset && reset()
+    self.reset()
   }
 })
