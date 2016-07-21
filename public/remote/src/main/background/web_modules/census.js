@@ -67,8 +67,11 @@ $.extend(Census.prototype,
     init: function () {
       var self = this
 
-      self.boot()
-      self.merge()
+      // 这样可以避免在本地单元测试时报错
+      if (self.chross !== undefined && !self.chross['onlyBoot']) {
+        self.boot()
+        self.merge()
+      }
     },
   }
 )

@@ -263,8 +263,8 @@ $.extend(Cache.prototype,
         $.extend(Cache.prototype, {boot: null})
       }
 
-      // 这样可以避免在本地单元测试时启动background才有的监听时刻
-      if (self.chross) {
+      // 这样可以避免在本地单元测试时只是通过boot初始化APIs
+      if (self.chross !== undefined && !self.chross['onlyBoot']) {
         // 导航即将开始之前
         self.onBeforeNavigate()
         // 创建标签页时

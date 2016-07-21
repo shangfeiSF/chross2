@@ -12,6 +12,8 @@ module.exports = {
         var self = this
 
         self.chross.cache.recordInCurrentBVS(moment, record, tabId)
+
+        return self.chross.cache.getInCurrentBVS(moment, tabId)
       }
     },
 
