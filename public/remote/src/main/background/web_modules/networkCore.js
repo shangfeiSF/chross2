@@ -96,8 +96,9 @@ module.exports = {
         var details = {}
 
         moments.forEach(function (moment) {
-          var result = self.chross.cache.getInAllBVS(moment, tabId)
-          details[moment] = result.data.map(function (item) {
+          var result = self.chross.cache.getInAllBVS(moment, tabId).data
+
+          details[moment] = result.map(function (item) {
             if (item.key === undefined) {
               return item
             }
@@ -114,50 +115,38 @@ module.exports = {
 
         return details
       },
-      filterInCurrentBVS: function (moments, patterm, tabId) {
+      filterInCurrentBVS: function (moments, pattern, tabId) {
         var self = this
         var pattern = new RegExp(pattern)
         var details = {}
 
         moments.forEach(function (moment) {
-          var result = self.chross.cache.getInCurrentBVS(moment, tabId)
-          details[moment] = result.data.map(function (item) {
-            if (item.key === undefined) {
-              return item
-            }
-            else {
-              return {
-                key: item.key,
-                value: item.value.filter(function (value) {
-                  return pattern.exec(value.url) !== null
-                })
-              }
-            }
-          })
+          var result = self.chross.cache.getInCurrentBVS(moment, tabId).data
+
+          details[moment] = result.key === undefined ? result : {
+            key: result.key,
+            value: result.value.filter(function (request) {
+              return pattern.exec(request.url) !== null
+            })
+          }
         })
 
         return details
       },
-      filterInSpecificBVS: function (moments, patterm, index, tabId) {
+      filterInSpecificBVS: function (moments, pattern, index, tabId) {
         var self = this
         var pattern = new RegExp(pattern)
         var details = {}
 
         moments.forEach(function (moment) {
-          var result = self.chross.cache.getInSpecificBVS(moment, tabId)
-          details[moment] = result.data.map(function (item) {
-            if (item.key === undefined) {
-              return item
-            }
-            else {
-              return {
-                key: item.key,
-                value: item.value.filter(function (value) {
-                  return pattern.exec(value.url) !== null
-                })
-              }
-            }
-          })
+          var result = self.chross.cache.getInSpecificBVS(moment, index, tabId).data
+
+          details[moment] = result.key === undefined ? result : {
+            key: result.key,
+            value: result.value.filter(function (request) {
+              return pattern.exec(request.url) !== null
+            })
+          }
         })
 
         return details

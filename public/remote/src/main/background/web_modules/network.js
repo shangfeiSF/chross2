@@ -97,7 +97,7 @@ $.extend(Network.prototype,
             })
             derivativeAPIs[API + 'onAllMoments'] = self[API].bind(self, self.moments)
 
-            $.extend(Network.prototype, derivativeAPIs)
+            $.extend(self, derivativeAPIs)
           })
         }
       })
@@ -105,15 +105,19 @@ $.extend(Network.prototype,
 
     init: function () {
       var self = this
-
-      if (self.boot !== null) {
-        self.boot()
-        $.extend(Network.prototype, {boot: null})
-      }
-
-      // 这样可以避免在本地单元测试时只是通过boot初始化APIs
+      
+      // 避免在本地单元测试时启动chrome上的webRequest
       if (self.chross !== undefined && !self.chross['onlyBoot']) {
+        if (self.boot !== null) {
+          self.boot()
+          $.extend(Network.prototype, {boot: null})
+        }
+
         self.monitor()
+      }
+      else {
+        // 进行单元测试时需要反复创建新的APIs
+        self.boot()
       }
     }
   }

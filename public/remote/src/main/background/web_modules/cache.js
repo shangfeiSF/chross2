@@ -258,19 +258,23 @@ $.extend(Cache.prototype,
     init: function () {
       var self = this
 
-      if (self.boot !== null) {
-        self.boot()
-        $.extend(Cache.prototype, {boot: null})
-      }
-
-      // 这样可以避免在本地单元测试时只是通过boot初始化APIs
+      // 避免在本地单元测试时启动chrome上的navigation
       if (self.chross !== undefined && !self.chross['onlyBoot']) {
+        if (self.boot !== null) {
+          self.boot()
+          $.extend(Cache.prototype, {boot: null})
+        }
+
         // 导航即将开始之前
         self.onBeforeNavigate()
         // 创建标签页时
         self.onTabCreated()
         // 关闭标签页时
         self.onTabRemoved()
+      }
+      else {
+        // 进行单元测试时需要反复创建新的APIs
+        self.boot()
       }
     }
   }
