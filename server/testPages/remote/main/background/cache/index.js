@@ -32,11 +32,17 @@ $.when(
       var module = config.module
       var mockData = config.mockData
 
+      // mock chross对象
+      var _chross = {
+        onlyBoot: true // chross的模块只会执行boot方法初始化APIS
+      }
+
       // 生成测试模块的实例
-      var cache = new module(undefined)  // chross的模块只会执行boot方法初始化APIS
+      var cache = new module(_chross)  // chross的模块只会执行boot方法初始化APIS
+
       // 载入mock数据
-      cache.tabsMap[mockData.tabId] = $.extend({}, mockData.tabStore)
-      cache.userTabsMap[mockData.tabId] = $.extend({}, mockData.userTabsMap)
+      cache.tabsMap[mockData.tabId] = $.extend(true, {}, mockData.tabStore)
+      cache.userTabsMap[mockData.tabId] = $.extend(true, {}, mockData.userTabsMap)
 
       return cache
     })

@@ -14,8 +14,7 @@ $.extend(Suite.prototype, {
 
       var msg = ['Passed：', '在全部的backgroundViewStore中创建属性(', key, ')并新添一个值等于(', values[0], ')'].join('')
       assert.notStrictEqual(result.data, null, msg)
-
-      debugger
+      
       viewStores.forEach(function (viewStore, index) {
         var msg = ['Passed：', '检查backgroundViewStore[', index, ']中属性(', key, ')的值等于(', values[0], ')'].join('')
         assert.deepEqual(viewStore[key], [values[0]], msg)
