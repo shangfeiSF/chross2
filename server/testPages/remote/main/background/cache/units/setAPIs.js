@@ -1,12 +1,12 @@
 $.extend(Suite.prototype, {
   testSetAPIs_BVS: function () {
     var self = this
-    var cache = self.cache
-
     var tabId = self.config.mockData.tabId
-    var viewStores = cache.tabsMap[tabId].viewStores
 
     QUnit.test("setInAllBVS：在全部的backgroundViewStore中设置某一属性等于某一值", function (assert) {
+      var cache = self.create()
+      var viewStores = cache.tabsMap[tabId].viewStores
+
       var key = 'aNumber'
       var value = 10
 
@@ -22,6 +22,9 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("setInCurrentBVS：在当前的backgroundViewStore中设置某一属性等于某一值", function (assert) {
+      var cache = self.create()
+      var viewStores = cache.tabsMap[tabId].viewStores
+
       var key = 'aString'
       var value = 'Chross'
 
@@ -43,6 +46,9 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("setInSpecificBVS：在指定的backgroundViewStore中设置某一属性等于某一值", function (assert) {
+      var cache = self.create()
+      var viewStores = cache.tabsMap[tabId].viewStores
+
       var key = 'aArray'
       var value = [10, 'Chross']
       var specificIndex = 3
@@ -63,18 +69,16 @@ $.extend(Suite.prototype, {
         }
       })
     })
-
-    self.reset()
   },
 
   testSetAPIs_UVS: function () {
     var self = this
-    var cache = self.cache
-
     var tabId = self.config.mockData.tabId
-    var viewStores = cache.userTabsMap[tabId].viewStores
 
     QUnit.test("setInAllUVS：在全部的userViewStore中设置某一属性等于某一值", function (assert) {
+      var cache = self.create()
+      var viewStores = cache.userTabsMap[tabId].viewStores
+
       var key = 'aNumber'
       var value = 10
 
@@ -90,6 +94,9 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("setInCurrentUVS：在当前的userViewStore中设置某一属性等于某一值", function (assert) {
+      var cache = self.create()
+      var viewStores = cache.userTabsMap[tabId].viewStores
+
       var key = 'aString'
       var value = 'Chross'
 
@@ -111,6 +118,9 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("setInSpecificUVS：在指定的userViewStore中设置某一属性等于某一值", function (assert) {
+      var cache = self.create()
+      var viewStores = cache.userTabsMap[tabId].viewStores
+
       var key = 'aArray'
       var value = [10, 'Chross']
       var specificIndex = 3
@@ -131,7 +141,5 @@ $.extend(Suite.prototype, {
         }
       })
     })
-
-    self.reset()
   }
 })

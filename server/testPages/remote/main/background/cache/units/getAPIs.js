@@ -1,11 +1,11 @@
 $.extend(Suite.prototype, {
   testGetAPIs_BVS: function () {
     var self = this
-    var cache = self.cache
-
     var tabId = self.config.mockData.tabId
 
     QUnit.test("getInAllBVS：在全部的backgroundViewStore中获取某一属性的值", function (assert) {
+      var cache = self.create()
+
       var key = 'protocol'
       var expected = {
         key: "protocol",
@@ -41,6 +41,8 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("getInCurrentBVS：在当前的backgroundViewStore中获取某一属性的值", function (assert) {
+      var cache = self.create()
+
       var key = 'frameIds'
       var expected = {
         key: "frameIds",
@@ -72,6 +74,8 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("getInSpecificBVS：在指定的backgroundViewStore中获取某一属性的值", function (assert) {
+      var cache = self.create()
+
       var key = 'onBeforeRequest'
       var specificIndex = 3
       var expected = {
@@ -101,17 +105,15 @@ $.extend(Suite.prototype, {
       var msg = ['Passed：', '在指定的backgroundViewStore[', specificIndex, ']中不存在属性(', key, ')'].join('')
       assert.deepEqual(result.data, expected, msg)
     })
-
-    self.reset()
   },
 
   testGetAPIs_UVS: function () {
     var self = this
-    var cache = self.cache
-
     var tabId = self.config.mockData.tabId
 
     QUnit.test("getInAllUVS：在全部的userViewStore中获取某一属性的值", function (assert) {
+      var cache = self.create()
+
       var key = 'userName'
       var expected = [{
         key: "userName",
@@ -170,6 +172,8 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("getInCurrentUVS：在当前的userViewStore中获取某一属性的值", function (assert) {
+      var cache = self.create()
+
       var key = 'userInfo'
       var expected = {
         key: "userInfo",
@@ -203,6 +207,8 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("getInSpecificUVS：在指定的userViewStore中获取某一属性的值", function (assert) {
+      var cache = self.create()
+
       var key = 'userId'
       var specificIndex = 3
       var expected = {
@@ -233,7 +239,5 @@ $.extend(Suite.prototype, {
       var msg = ['Passed：', '在指定的userViewStore[', specificIndex, ']中不存在属性(', key, ')'].join('')
       assert.deepEqual(result.data, expected, msg)
     })
-
-    self.reset()
   }
 })

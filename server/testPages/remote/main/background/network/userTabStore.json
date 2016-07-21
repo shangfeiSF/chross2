@@ -1,0 +1,37 @@
+{
+  "userTabStore": {
+    "timeStamp": "2016-07-20T07:38:17.047Z",
+    "viewStores": [
+      {
+        "userName": "shangfei",
+        "userType": ["admin", "developer"],
+        "userId": 73812,
+        "userInfo": {
+          "floor": 17,
+          "seat": 158,
+          "tel": ""
+        },
+        "timeStamp": "2016-07-20T07:38:17.047Z"
+      }, {
+        "userName": "xiaoshao",
+        "userType": ["guest", "developer"],
+        "timeStamp": "2016-07-20T07:38:17.047Z"
+      }, {
+        "userId": null,
+        "userInfo": {
+          "tel": ""
+        },
+        "timeStamp": "2016-07-20T07:38:17.047Z"
+      }, {
+        "userName": "",
+        "userId": null,
+        "timeStamp": "2016-07-20T07:38:17.047Z"
+      }, {
+        "userInfo": {
+          "tel": "18612697399"
+        },
+        "timeStamp": "2016-07-20T07:38:17.047Z"
+      }
+    ]
+  }
+}

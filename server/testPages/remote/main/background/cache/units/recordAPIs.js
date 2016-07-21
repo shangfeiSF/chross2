@@ -1,12 +1,12 @@
 $.extend(Suite.prototype, {
   testRecordAPIs_BVS: function () {
     var self = this
-    var cache = self.cache
-
     var tabId = self.config.mockData.tabId
-    var viewStores = cache.tabsMap[tabId].viewStores
 
     QUnit.test("recordInAllBVS：在全部的backgroundViewStore中为某一属性新添一个值", function (assert) {
+      var cache = self.create()
+      var viewStores = cache.tabsMap[tabId].viewStores
+
       var key = 'someNumbers'
       var values = [10, 20]
 
@@ -15,6 +15,7 @@ $.extend(Suite.prototype, {
       var msg = ['Passed：', '在全部的backgroundViewStore中创建属性(', key, ')并新添一个值等于(', values[0], ')'].join('')
       assert.notStrictEqual(result.data, null, msg)
 
+      debugger
       viewStores.forEach(function (viewStore, index) {
         var msg = ['Passed：', '检查backgroundViewStore[', index, ']中属性(', key, ')的值等于(', values[0], ')'].join('')
         assert.deepEqual(viewStore[key], [values[0]], msg)
@@ -32,6 +33,9 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("recordInCurrentBVS：在当前的backgroundViewStore中为某一属性新添一个值", function (assert) {
+      var cache = self.create()
+      var viewStores = cache.tabsMap[tabId].viewStores
+
       var key = 'someStrings'
       var values = ['Chross', 'Cache']
 
@@ -69,6 +73,9 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("recordInSpecificBVS：在指定的backgroundViewStore中设置某一属性等于某一值", function (assert) {
+      var cache = self.create()
+      var viewStores = cache.tabsMap[tabId].viewStores
+
       var key = 'someObjects'
       var values = [{name: 'chross'}, {version: 1.0}]
       var specificIndex = 3
@@ -106,18 +113,16 @@ $.extend(Suite.prototype, {
         }
       })
     })
-    
-    self.reset()
   },
 
   testRecordAPIs_UVS: function () {
     var self = this
-    var cache = self.cache
-
     var tabId = self.config.mockData.tabId
-    var viewStores = cache.userTabsMap[tabId].viewStores
 
     QUnit.test("recordInAllUVS：在全部的userViewStore中为某一属性新添一个值", function (assert) {
+      var cache = self.create()
+      var viewStores = cache.userTabsMap[tabId].viewStores
+
       var key = 'someNumbers'
       var values = [10, 20]
 
@@ -143,6 +148,9 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("recordInCurrentUVS：在当前的userViewStore中为某一属性新添一个值", function (assert) {
+      var cache = self.create()
+      var viewStores = cache.userTabsMap[tabId].viewStores
+
       var key = 'someStrings'
       var values = ['Chross', 'Cache']
 
@@ -180,6 +188,9 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("recordInSpecificUVS：在指定的userViewStore中设置某一属性等于某一值", function (assert) {
+      var cache = self.create()
+      var viewStores = cache.userTabsMap[tabId].viewStores
+
       var key = 'someObjects'
       var values = [{name: 'chross'}, {version: 1.0}]
       var specificIndex = 3
@@ -217,7 +228,5 @@ $.extend(Suite.prototype, {
         }
       })
     })
-
-    self.reset()
   }
 })

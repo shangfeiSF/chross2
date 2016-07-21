@@ -1,11 +1,11 @@
 $.extend(Suite.prototype, {
   testExiistsAPIs_BVS: function () {
     var self = this
-    var cache = self.cache
-
     var tabId = self.config.mockData.tabId
 
     QUnit.test("existsInAllBVS：在全部的backgroundViewStore中检查某一属性是否存在", function (assert) {
+      var cache = self.create()
+
       var key = 'timeStamp'
 
       var result = cache.existsInAllBVS(key, tabId)
@@ -20,6 +20,8 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("existsInCurrentBVS：在当前的backgroundViewStore中检查某一属性是否存在", function (assert) {
+      var cache = self.create()
+
       var key = 'onBeforeRequest'
 
       var result = cache.existsInCurrentBVS(key, tabId)
@@ -32,6 +34,8 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("existsInSpecificBVS：在指定的backgroundViewStore中检查某一属性存在性", function (assert) {
+      var cache = self.create()
+
       var key = 'onBeforeRedirect'
       var specificIndex = 3
 
@@ -43,17 +47,15 @@ $.extend(Suite.prototype, {
       var msg = ['Passed：', '在指定的backgroundViewStore[', specificIndex, ']中不存在属性(', key, ')'].join('')
       assert.strictEqual(result.data, false, msg)
     })
-
-    self.reset()
   },
 
   testExiistsAPIs_UVS: function () {
     var self = this
-    var cache = self.cache
-
     var tabId = self.config.mockData.tabId
 
     QUnit.test("existsInAllUVS：在全部的userViewStore中检查某一属性是否存在", function (assert) {
+      var cache = self.create()
+
       var key = 'userName'
       var expected = [true, true, false, true, false]
 
@@ -69,6 +71,8 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("existsInCurrentUVS：在当前的userViewStore中检查某一属性是否存在", function (assert) {
+      var cache = self.create()
+
       var key = 'userId'
 
       var result = cache.existsInCurrentUVS(key, tabId)
@@ -81,6 +85,8 @@ $.extend(Suite.prototype, {
     })
 
     QUnit.test("existsInSpecificUVS：在指定的userViewStore中检查某一属性存在性", function (assert) {
+      var cache = self.create()
+
       var key = 'userInfo'
       var specificIndex = 3
 
@@ -92,7 +98,5 @@ $.extend(Suite.prototype, {
       var msg = ['Passed：', '在指定的userViewStore[', specificIndex, ']中不存在属性(', key, ')'].join('')
       assert.strictEqual(result.data, false, msg)
     })
-
-    self.reset()
   }
 })

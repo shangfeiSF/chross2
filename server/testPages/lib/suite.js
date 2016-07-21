@@ -7,9 +7,9 @@ function Suite(config) {
 }
 
 $.extend(Suite.prototype, {
-  init: function (boot) {
+  init: function (create) {
     var self = this
 
-    boot.bind(self)()
+    self.create = create
   }
 })
