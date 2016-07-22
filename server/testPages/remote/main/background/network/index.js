@@ -60,16 +60,10 @@ $.when(
     })
 
     // 执行测试用例集合
-    suite.testRecordAPIs_core()
-
-    suite.testExistsAPIs_core()
-    suite.testExistsAPIs_derivative()
-
-    suite.testGetAPIs_core()
-    suite.testGetAPIs_derivative()
-
-    suite.testFilterAPIs_core()
-    suite.testFilterAPIs_derivative()
+    suite.testRecordAPIs()
+    suite.testExistsAPIs()
+    suite.testGetAPIs()
+    suite.testFilterAPIs()
   })
   .fail(function () {
     alert('请检查本地单元测试服务是否启动！')
