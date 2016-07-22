@@ -8,12 +8,17 @@ module.exports = {
 
   groups: {
     recordAPIs: {
-      recordInCurrentBVS: function (moment, record, tabId) {
+      recordInCurrentBVS: function (moments, record, tabId) {
         var self = this
+        var details = {}
 
-        self.chross.cache.recordInCurrentBVS(moment, record, tabId)
+        moments.forEach(function (moment) {
+          self.chross.cache.recordInCurrentBVS(moment, record, tabId)
 
-        return self.chross.cache.getInCurrentBVS(moment, tabId)
+          details[moment] = self.chross.cache.getInCurrentBVS(moment, tabId)
+        })
+
+        return details
       }
     },
 
@@ -23,8 +28,7 @@ module.exports = {
         var exists = {}
 
         moments.forEach(function (moment) {
-          var result = self.chross.cache.existsInAllBVS(moment, tabId)
-          exists[moment] = result.data !== null ? result.data : result.msg
+          exists[moment] = self.chross.cache.existsInAllBVS(moment, tabId)
         })
 
         return exists
@@ -34,8 +38,7 @@ module.exports = {
         var exists = {}
 
         moments.forEach(function (moment) {
-          var result = self.chross.cache.existsInCurrentBVS(moment, tabId)
-          exists[moment] = result.data !== null ? result.data : result.msg
+          exists[moment] = self.chross.cache.existsInCurrentBVS(moment, tabId)
         })
 
         return exists
@@ -45,8 +48,7 @@ module.exports = {
         var exists = {}
 
         moments.forEach(function (moment) {
-          var result = self.chross.cache.existsInSpecificBVS(moment, index, tabId)
-          exists[moment] = result.data !== null ? result.data : result.msg
+          exists[moment] = self.chross.cache.existsInSpecificBVS(moment, index, tabId)
         })
 
         return exists

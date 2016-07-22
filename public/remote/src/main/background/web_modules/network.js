@@ -57,7 +57,7 @@ $.extend(Network.prototype,
     handler: function (moment, record, tabId) {
       var self = this
 
-      self.recordInCurrentBVS(moment, record, tabId)
+      self.recordInCurrentBVS([moment], record, tabId)
       self.census.tasks[moment].forEach(function (task) {
         task(record.details)
       })
