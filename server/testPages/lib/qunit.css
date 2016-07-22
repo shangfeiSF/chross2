@@ -12,7 +12,7 @@
 /** Font Family and Sizes */
 
 #qunit-tests, #qunit-header, #qunit-banner, #qunit-testrunner-toolbar, #qunit-filteredTest, #qunit-userAgent, #qunit-testresult {
-    font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;
+    font-family: "微软雅黑", "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;
 }
 
 #qunit-testrunner-toolbar, #qunit-filteredTest, #qunit-userAgent, #qunit-testresult, #qunit-tests li {
@@ -248,6 +248,7 @@
 
 #qunit-tests li strong {
     cursor: pointer;
+    font-weight: normal;
 }
 
 #qunit-tests li.skipped strong {

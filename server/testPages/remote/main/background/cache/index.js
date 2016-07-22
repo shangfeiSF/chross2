@@ -48,20 +48,11 @@ $.when(
     })
 
     // 执行测试用例集合
-    suite.testSetAPIs_BVS()
-    suite.testSetAPIs_UVS()
-
-    suite.testRecordAPIs_BVS()
-    suite.testRecordAPIs_UVS()
-
-    suite.testExiistsAPIs_BVS()
-    suite.testExiistsAPIs_UVS()
-
-    suite.testGetAPIs_BVS()
-    suite.testGetAPIs_UVS()
-
-    suite.testGetViewAPIs_BVS()
-    suite.testGetViewAPIs_UVS()
+    suite.testSetAPIs()
+    suite.testRecordAPIs()
+    suite.testExistsAPIs()
+    suite.testGetAPIs()
+    suite.testGetViewAPIs()
   })
   .fail(function () {
     alert('请检查本地单元测试服务是否启动！')
