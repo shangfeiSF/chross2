@@ -1,76 +1,81 @@
+var message = require('message')
+
 function Probe(chross, config) {
   var config = config || {}
 
   var defaultConfig = {}
 
-  this.config = $.extend(defaultConfig, config)
+  this.config = $.extend(true, defaultConfig, config)
 
-  this.runCodeListeners = {}
+  this.listenerInfosMap = {}
 
   this.chross = chross
-  
+
   this.init()
 }
 
-$.extend(Probe.prototype, {
-  generateUuid: function () {
-    return [+new Date(), '_', Math.floor(Math.random() * 3e10)].join('')
-  },
+$.extend(Probe.prototype,
+  {
+    runCodeInIframe: function (code, config) {
+      var self = this
+      var port = self.chross.port
 
-  resolveListenerByUuid: function (uuid, data) {
-    var self = this
-
-    if (self.runCodeListeners.hasOwnProperty(uuid)) {
-      self.runCodeListeners[uuid](data)
-    }
-    else {
-      console.error('Can not resolve the runCodeResult')
-    }
-  },
-
-  monitorRunCodeResult: function () {
-    var self = this
-
-    var topPort = self.chross.port.getTopPort()
-
-    topPort.onMessage.addListener(function (msg) {
-      if (msg.uuid === undefined) return false
-
-      self.resolveListenerByUuid(msg.uuid, msg.data)
-    })
-
-  },
-
-  runCodeInIframe: function (code, config) {
-    var self = this
-
-    var uuid = self.generateUuid()
-
-    var listener = function () {
-    }
-
-    if (config) {
-      if ($.isFunction(config.listener)) {
-        listener = config.listener
+      var listener = function () {
       }
-      else if ($.isFunction(config)) {
-        listener = config
+
+      if (config) {
+        if ($.isFunction(config.listener)) {
+          listener = config.listener
+        }
+        else if ($.isFunction(config)) {
+          listener = config
+        }
       }
+
+      self.register(listener)
+        .then(function (sign) {
+          port.post({
+            sign: sign,
+            command: 'runCodeInIframe',
+            params: {
+              sign: sign,
+              code: code.toString()
+            }
+          })
+        })
     }
-
-    self.runCodeListeners[uuid] = listener
-
-    self.chross.port.post('runCodeInIframe', {
-      uuid: uuid,
-      code: code.toString()
-    })
   },
+  {
+    resolve: function (msg) {
+      var self = this
+      var uuid = msg.sign.uuid
 
-  init: function () {
-    var self = this
+      if (self.listenerInfosMap.hasOwnProperty(uuid)) {
+        self.listenerInfosMap[uuid](msg)
+      } else {
+        console.error('Can not resolve!')
+      }
+    },
 
-    self.monitorRunCodeResult()
-  }
-})
+    register: function (listener) {
+      var self = this
+      var uuid = message.generateUuid()
+
+      var defer = $.Deferred()
+      var promise = defer.promise()
+
+      self.listenerInfosMap[uuid] = listener
+
+      defer.resolve({
+        module: self.constructor.name,
+        uuid: uuid
+      })
+
+      return promise
+    },
+
+    init: function () {
+    }
+  })
 
 module.exports = Probe

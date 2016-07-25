@@ -1,9 +1,13 @@
+var commands = require('commands')
+
 function Port(chross) {
   this.ports = {
     top: 'topPort'
   }
 
   this.chross = chross
+
+  this.commands = Object.keys(commands)
 
   this.init()
 }
@@ -21,29 +25,36 @@ $.extend(Port.prototype, {
 
   monitorTopPort: function () {
     var self = this
+    var chross = self.chross
 
     self.ports.top.onMessage.addListener(function (msg) {
-      if (msg.uuid) return false
-      console.log(msg)
+      if (msg.type == 'notice') {
+        console.log(msg)
+      }
+
+      if (msg.type == 'response') {
+        switch (msg.sign.module) {
+          case chross.probe.constructor.name:
+            chross.probe.resolve(msg)
+            break
+          case chross.navigation.constructor.name:
+            chross.navigation.resolve(msg)
+            break
+          case chross.network.constructor.name:
+            chross.network.resolve(msg)
+            break
+        }
+      }
     })
 
     self.ports.top.onDisconnect.addListener(function (port) {
     })
   },
 
-  getTopPort: function () {
+  post: function (details) {
     var self = this
 
-    return self.ports.top
-  },
-
-  post: function (command, data) {
-    var self = this
-
-    self.getTopPort().postMessage({
-      cmd: command,
-      data: data
-    })
+    self.ports.top.postMessage(details)
   }
 })
 

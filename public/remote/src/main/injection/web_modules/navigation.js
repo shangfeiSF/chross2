@@ -1,78 +1,72 @@
+var message = require('message')
+
 function Navigation(chross, config) {
   var config = config || {}
 
   var defaultConfig = {}
 
-  this.config = $.extend(defaultConfig, config)
+  this.config = $.extend(true, defaultConfig, config)
 
+  this.listenerInfosMap = {}
+  
   this.chross = chross
-
-  this.urlChangeDeferInfos = {}
-
+  
   this.init()
 }
 
-$.extend(Navigation.prototype, {
-  resolveDefer: function (url, urlChangeOccurAt) {
-    var self = this
+$.extend(Navigation.prototype,
+  {
+    urlChange: function (url) {
+      var self = this
+      var port = self.chross.port
 
-    var deferInfo = self.urlChangeDeferInfos[urlChangeOccurAt]
+      var listener = $.Deferred()
 
-    var result = {
-      allow: false,
-      url: url
+      self.register(listener)
+        .then(function (sign) {
+          port.post({
+            sign: sign,
+            command: 'urlChange',
+            params: {
+              url: url
+            }
+          })
+        })
+
+      return listener.promise()
     }
+  },
+  {
+    resolve: function (msg) {
+      var self = this
+      var uuid = msg.sign.uuid
 
-    if (deferInfo.url === url) {
-      result.allow = true
+      if (self.listenerInfosMap.hasOwnProperty(uuid)) {
+        self.listenerInfosMap[uuid].resolve(msg)
+      } else {
+        console.error('Can not resolve!')
+      }
+    },
+
+    register: function (listener) {
+      var self = this
+      var uuid = message.generateUuid()
+
+      var defer = $.Deferred()
+      var promise = defer.promise()
+
+      self.listenerInfosMap[uuid] = listener
+
+      defer.resolve({
+        module: self.constructor.name,
+        uuid: uuid
+      })
+
+      return promise
+    },
+
+    init: function () {
     }
-
-    deferInfo.defer.resolve(result)
-  },
-
-  monitorUrlChange: function () {
-    var self = this
-
-    var topPort = self.chross.port.getTopPort()
-
-    topPort.onMessage.addListener(function (msg) {
-      if (msg.sign === undefined || msg.timeStamp === undefined) return false
-
-      var urlChangeOccurAt = [msg.sign, msg.timeStamp].join('@')
-
-      self.resolveDefer(msg.url, urlChangeOccurAt)
-    })
-  },
-
-  urlChange: function (url) {
-    var self = this
-
-    var defer = $.Deferred()
-    var promise = defer.promise()
-
-    var timeStamp = +new Date()
-    var sign = Math.round(Math.random() * 3e10)
-    var urlChangeOccurAt = [sign, timeStamp].join('@')
-
-    self.urlChangeDeferInfos[urlChangeOccurAt] = {
-      defer: defer,
-      url: url
-    }
-
-    self.chross.port.post('urlChange', {
-      url: url,
-      sign: sign,
-      timeStamp: timeStamp
-    })
-
-    return promise
-  },
-
-  init: function () {
-    var self = this
-
-    self.monitorUrlChange()
-  }
-})
+  })
 
 module.exports = Navigation
