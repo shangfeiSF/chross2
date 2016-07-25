@@ -1,36 +1,32 @@
 var Handler = require('handler')
+var commands = require('commands')
 
 function Agent(chross, config) {
   var config = config || {}
 
   var defaultConfig = {}
 
-  this.config = $.extend(defaultConfig, config)
+  this.config = $.extend(true, defaultConfig, config)
 
   this.handler = new Handler(chross, {
     crossIframeURL: chross.config.crossIframeURL
   })
 
-  this.commands = {}
+  this.commands = commands || {}
 
   this.chross = chross
 
-  this.init(config.commands)
+  this.init()
 }
 
 $.extend(Agent.prototype, {
-  findAction: function (commands) {
+  findAction: function (command) {
     var self = this
 
-    return self.commands[commands]
+    return self.commands[command]
   },
 
-  init: function (commands) {
-    var self = this
-
-    var actions = self.handler.actionsMap
-
-    self.commands = $.extend(actions, commands || {})
+  init: function () {
   }
 })
 

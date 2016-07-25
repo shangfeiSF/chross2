@@ -61,8 +61,7 @@ module.exports = {
         var details = {}
 
         moments.forEach(function (moment) {
-          var result = self.chross.cache.getInAllBVS(moment, tabId)
-          details[moment] = result.data
+          details[moment] = self.chross.cache.getInAllBVS(moment, tabId)
         })
 
         return details
@@ -72,8 +71,7 @@ module.exports = {
         var details = {}
 
         moments.forEach(function (moment) {
-          var result = self.chross.cache.getInCurrentBVS(moment, tabId)
-          details[moment] = result.data
+          details[moment] = self.chross.cache.getInCurrentBVS(moment, tabId)
         })
 
         return details
@@ -83,8 +81,7 @@ module.exports = {
         var details = {}
 
         moments.forEach(function (moment) {
-          var result = self.chross.cache.getInSpecificBVS(moment, index, tabId)
-          details[moment] = result.data
+          details[moment] = self.chross.cache.getInSpecificBVS(moment, index, tabId)
         })
 
         return details
@@ -98,21 +95,26 @@ module.exports = {
         var details = {}
 
         moments.forEach(function (moment) {
-          var result = self.chross.cache.getInAllBVS(moment, tabId).data
+          var result = self.chross.cache.getInAllBVS(moment, tabId)
 
-          details[moment] = result.map(function (item) {
-            if (item.key === undefined) {
-              return item
-            }
-            else {
-              return {
-                key: item.key,
-                value: item.value.filter(function (value) {
-                  return pattern.exec(value.url) !== null
-                })
+          if (result.data !== null) {
+            details[moment] = result.data.map(function (item) {
+              if (item.key === undefined) {
+                return item
               }
-            }
-          })
+              else {
+                return {
+                  key: item.key,
+                  value: item.value.filter(function (value) {
+                    return pattern.exec(value.url) !== null
+                  })
+                }
+              }
+            })
+          }
+          else {
+            details[moment] = result
+          }
         })
 
         return details
@@ -123,13 +125,18 @@ module.exports = {
         var details = {}
 
         moments.forEach(function (moment) {
-          var result = self.chross.cache.getInCurrentBVS(moment, tabId).data
+          var result = self.chross.cache.getInCurrentBVS(moment, tabId)
 
-          details[moment] = result.key === undefined ? result : {
-            key: result.key,
-            value: result.value.filter(function (request) {
-              return pattern.exec(request.url) !== null
-            })
+          if (result.data !== null) {
+            details[moment] = result.data.key === undefined ? result : {
+              key: result.data.key,
+              value: result.data.value.filter(function (request) {
+                return pattern.exec(request.url) !== null
+              })
+            }
+          }
+          else {
+            details[moment] = result
           }
         })
 
@@ -141,14 +148,21 @@ module.exports = {
         var details = {}
 
         moments.forEach(function (moment) {
-          var result = self.chross.cache.getInSpecificBVS(moment, index, tabId).data
+          var result = self.chross.cache.getInSpecificBVS(moment, index, tabId)
 
-          details[moment] = result.key === undefined ? result : {
-            key: result.key,
-            value: result.value.filter(function (request) {
-              return pattern.exec(request.url) !== null
-            })
+          if (result.data !== null) {
+            details[moment] = result.data.key === undefined ? result : {
+              key: result.data.key,
+              value: result.data.value.filter(function (request) {
+                return pattern.exec(request.url) !== null
+              })
+            }
           }
+          else {
+            details[moment] = result
+          }
+
+
         })
 
         return details

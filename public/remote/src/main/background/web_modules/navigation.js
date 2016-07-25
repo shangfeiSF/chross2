@@ -1,3 +1,5 @@
+var message = require('message')
+
 function Navigation(chross, config) {
   var config = config || {}
 
@@ -158,10 +160,9 @@ $.extend(Navigation.prototype, {
 
       var port = self.chross.port.getPortByTabId(details.tabId)
 
-      port && port.postMessage({
-        type: 'private',
-        data: 'PageReady'
-      })
+      port && port.postMessage(message.notice({
+        spec: 'Page is ready and inject user script'
+      }))
 
       chrome.tabs.executeScript(details.tabId, {
         code: self.chross.userScript,

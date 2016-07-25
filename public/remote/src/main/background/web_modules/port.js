@@ -1,9 +1,11 @@
+var message = require('message')
+
 function Port(chross, config) {
   var config = config || {}
 
   var defaultConfig = {}
 
-  this.config = $.extend(defaultConfig, config)
+  this.config = $.extend(true, defaultConfig, config)
 
   this.ports = {}
 
@@ -19,24 +21,17 @@ $.extend(Port.prototype, {
     var port = port
 
     port.onMessage.addListener(function (msg) {
-      var cmd = msg.cmd
-      var data = msg.data
-
       var handler = self.chross.agent.handler
+      var action = self.chross.agent.findAction(msg.command)
 
-      var action = self.chross.agent.findAction(cmd)
-
-      if (action !== undefined) {
-        handler[action](data, port.sender)
-          .then(function (result) {
-            port.postMessage(result)
+      if (action) {
+        handler[action](msg.params || {}, msg.data || {}, port.sender)
+          .then(function (output) {
+            output && port.postMessage(message.response(msg, output))
           })
       }
       else {
-        port.postMessage({
-          type: 'private',
-          content: 'invalid command:' + cmd
-        })
+        port.postMessage(message.response(msg))
       }
     })
 

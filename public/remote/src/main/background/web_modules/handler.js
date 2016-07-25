@@ -5,9 +5,7 @@ function Handler(chross, config) {
 
   var defaultConfig = {}
 
-  this.config = $.extend(defaultConfig, config)
-
-  this.actionsMap = {}
+  this.config = $.extend(true, defaultConfig, config)
 
   this.chross = chross
 
@@ -18,18 +16,7 @@ $.extend(Handler.prototype,
   handlerCore.actions,
   handlerCore.helpers,
   {
-    registerActions: function () {
-      var self = this
-
-      Object.keys(handlerCore.actions).forEach(function (action) {
-        self.actionsMap[action] = action
-      })
-    },
-
     init: function () {
-      var self = this
-
-      self.registerActions()
     }
   }
 )

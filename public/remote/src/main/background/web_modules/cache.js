@@ -39,7 +39,7 @@ $.extend(Cache.prototype,
           return ['Can not find the curent viewStore belongs to the tab with tabId=', tabId].join('')
         }
         else {
-          return ['Can not find the specific viewStore with index=', index, 'belongs to the tab with tabid=', tabId].join('')
+          return ['Can not find the specific viewStore with index=', index, ' belongs to the tab with tabid=', tabId].join('')
         }
       },
       // noneAttribute暂时没有使用
