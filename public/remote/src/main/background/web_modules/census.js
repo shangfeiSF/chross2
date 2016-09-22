@@ -1,33 +1,12 @@
 var censusCore = require('censusCore')
+var momentsConfig = require('momentsConfig')
 
 function Census(chross, config) {
   var config = config || {}
 
-  var defaultConfig = {
-    moments: [
-      'onBeforeRequest',
-      'onBeforeSendHeaders',
-      'onSendHeaders',
-      'onHeadersReceived',
-      'onBeforeRedirect',
-      'onResponseStarted',
-      'onCompleted',
-      'onErrorOccurred'
-    ],
+  var defaultConfig = {}
 
-    malias: {
-      brq: 'onBeforeRequest',
-      bsh: 'onBeforeSendHeaders',
-      sh: 'onSendHeaders',
-      hr: 'onHeadersReceived',
-      brd: 'onBeforeRedirect',
-      rs: 'onResponseStarted',
-      c: 'onCompleted',
-      eo: 'onErrorOccurred'
-    },
-  }
-
-  this.config = $.extend(defaultConfig, config)
+  this.config = $.extend(true, defaultConfig, config)
 
   this.tasks = {}
 
@@ -37,10 +16,11 @@ function Census(chross, config) {
 }
 
 $.extend(Census.prototype,
+  momentsConfig,
   {
     merge: function () {
       var self = this
-      var moments = self.config.moments
+      var moments = self.moments
 
       moments.forEach(function (moment) {
         var userTasks = self.chross.userTasks[moment]
@@ -53,7 +33,7 @@ $.extend(Census.prototype,
 
     boot: function () {
       var self = this
-      var moments = self.config.moments
+      var moments = self.moments
 
       moments.forEach(function (moment) {
         self.tasks[moment] = new Array()

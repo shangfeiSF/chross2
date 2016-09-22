@@ -1,4 +1,5 @@
 var message = require('message')
+var momentsConfig = require('momentsConfig')
 
 function Network(chross, config) {
   var config = config || {}
@@ -15,6 +16,7 @@ function Network(chross, config) {
 }
 
 $.extend(Network.prototype,
+  momentsConfig,
   {
     existsInAllViews: function (moments) {
       var self = this

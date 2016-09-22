@@ -37,7 +37,7 @@ $.extend(Loader.prototype, {
           active: true
         }, function (tab) {
           var message = '%cGot UserScript and urlsList'
-          console.log(message, 'color: #bb1100; font-weight: bold;')
+          console.log(message, 'color: #00ff00; font-weight: bold;')
         })
       })
       .fail(function () {

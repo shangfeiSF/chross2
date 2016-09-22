@@ -1,4 +1,5 @@
 var message = require('message')
+var momentsConfig = require('momentsConfig')
 
 function Navigation(chross, config) {
   var config = config || {}
@@ -122,6 +123,33 @@ $.extend(Navigation.prototype, {
     actions.length && actions[0]()
   },
 
+  ignoreFromTypeIsOther: function (tabId) {
+    var self = this
+
+    var tabsMap = self.chross.cache.tabsMap
+    var tabStore = tabsMap[tabId]
+    var length = tabStore.viewStores.length
+
+    if (!length) return false
+
+    var lastestViewStore = tabStore.viewStores[length - 1]
+    momentsConfig.moments.forEach(function (moment) {
+      if (lastestViewStore.hasOwnProperty(moment)) {
+        var index = null
+
+        var item = lastestViewStore[moment]
+        for (var i = 0; i < item.length; i++) {
+          if (item[i].details.type === 'other') {
+            index = i
+            break
+          }
+        }
+
+        index && (lastestViewStore[moment] = lastestViewStore[moment].slice(0, index))
+      }
+    })
+  },
+
   onBeforeNavigate: function () {
     var self = this
 
@@ -158,6 +186,9 @@ $.extend(Navigation.prototype, {
     chrome.webNavigation.onCompleted.addListener(function (details) {
       if (details.frameId !== 0) return false
 
+      // 避免chrome-dev-tools增干扰网络请求的统计结果
+      self.ignoreFromTypeIsOther(details.tabId)
+
       var port = self.chross.port.getPortByTabId(details.tabId)
 
       port && port.postMessage(message.notice({
@@ -169,7 +200,7 @@ $.extend(Navigation.prototype, {
         allFrames: false,
         matchAboutBlank: true
       }, function () {
-        console.log('%cInjected user content', 'color: #bb1100; font-weight: bold;')
+        console.log('%cInjected user content', 'color: #00ff00; font-weight: bold;')
       })
     })
   },

@@ -1,54 +1,59 @@
-chross.probe.runCodeInIframe(function () {
-  var body = document.getElementsByTagName('body')[0]
-  if (body) {
-    var imgs = document.querySelectorAll('img')
-    for (var i = 0; i < imgs.length; i++) {
-      imgs[i].setAttribute('src', 'http://wwc.alicdn.com/avatar/getAvatar.do?userNick=johnny2008bupt&width=80&height=80&type=sns&_input_charset=UTF-8')
+var probe = chross.probe
+var network = chross.network
+var alias = network.alias
+
+var focusURL = 'http://localhost/.*.html'
+var focusViewIndex = 2
+
+probe.runCodeInIframe(
+  function () {
+    var body = document.getElementsByTagName('body')[0]
+    if (body) {
+      var imgs = document.querySelectorAll('img')
+      for (var i = 0; i < imgs.length; i++) {
+        imgs[i].setAttribute('src', 'http://wwc.alicdn.com/avatar/getAvatar.do?userNick=johnny2008bupt&width=80&height=80&type=sns&_input_charset=UTF-8')
+      }
+      return {
+        tip: 'replace completed!'
+      }
     }
-    return {
-      tip: 'replace completed!'
+  },
+  {
+    listener: function (result) {
+      //  console.log(result.output.value)
     }
   }
-}, {
-  listener: function (result) {
-    // console.log(result)
-  }
-})
+)
 
-chross.network.existsInAllViews(['onBeforeRequest']).then(function (result) {
-  console.log(result)
-})
-chross.network.existsInCurrentView(['onBeforeSendHeaders']).then(function (result) {
-  console.log(result)
-})
-chross.network.existsInSpecificView(['onHeadersReceived'], 2).then(function (result) {
-  console.log(result)
-})
+$.when(
+  network.existsInAllViews([alias.brq]),
+  network.existsInCurrentView([alias.bsh]),
+  network.existsInSpecificView([alias.hr], focusViewIndex),
 
-chross.network.getInAllViews(['onBeforeRequest']).then(function (result) {
-  console.warn(result)
-})
-chross.network.getInCurrentView(['onBeforeSendHeaders']).then(function (result) {
-  console.warn(result)
-})
-chross.network.getInSpecificView(['onHeadersReceived'], 2).then(function (result) {
-  console.warn(result)
-})
+  network.getInAllViews([alias.brq]),
+  network.getInCurrentView([alias.bsh]),
+  network.getInSpecificView([alias.hr], focusViewIndex),
 
-chross.network.filterInAllViews(['onBeforeRequest'], 'http://localhost/entry.html').then(function (result) {
-  console.info(result)
-})
-chross.network.filterInCurrentView(['onBeforeRequest'], 'http://localhost/entry.html').then(function (result) {
-  console.info(result)
-})
-chross.network.filterInSpecificView(['onBeforeRequest'], 'http://localhost/entry.html', 2).then(function (result) {
-  console.info(result)
+  network.filterInAllViews([alias.brq], focusURL),
+  network.filterInCurrentView([alias.bsh], focusURL),
+  network.filterInSpecificView([alias.hr], focusURL, focusViewIndex)
+).then(function (aexists, cexists, sexists, aget, cget, sget, afilter, cfilter, sfilter) {
+  console.info(aexists)
+  console.info(cexists)
+  console.info(sexists)
+
+  console.warn(aget)
+  console.warn(cget)
+  console.warn(sget)
+
+  console.log(afilter)
+  console.log(cfilter)
+  console.log(sfilter)
 })
 
 setTimeout(function () {
   chross.navigation.urlChange('http://localhost/entry.html')
     .then(function (result) {
-      // console.info(result)
-      // window.location.href = 'http://localhost/entry.html'
+      window.location.href = 'http://localhost/entry.html'
     })
-}, 5000)
+}, 300000)

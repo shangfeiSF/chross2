@@ -1,12 +1,13 @@
 var Census = require('census')
 var networkCore = require('networkCore')
+var momentsConfig = require('momentsConfig')
 
 function Network(chross, config) {
   var config = config || {}
 
   var defaultConfig = {}
 
-  this.config = $.extend(defaultConfig, config)
+  this.config = $.extend(true, defaultConfig, config)
 
   this.census = new Census(chross, {
     moments: this.moments,
@@ -23,29 +24,8 @@ $.extend(Network.prototype,
   networkCore.groups.existsAPIs,
   networkCore.groups.getAPIs,
   networkCore.groups.filterAPIs,
+  momentsConfig,
   {
-    moments: [
-      'onBeforeRequest',  // 当请求即将发出时
-      'onBeforeSendHeaders',   // 当请求即将发出，初始标头已经准备好时
-      'onSendHeaders',  // 标头发送至网络前时
-      'onHeadersReceived',  // 接收到 HTTP(S) 响应标头时
-      'onBeforeRedirect',  // 当重定向即将执行时
-      'onResponseStarted',  // 当接收到响应正文的第一个字节时
-      'onCompleted',  // 当请求成功处理后
-      'onErrorOccurred'  // 当请求不能成功处理时
-    ],
-
-    malias: {
-      brq: 'onBeforeRequest',
-      bsh: 'onBeforeSendHeaders',
-      sh: 'onSendHeaders',
-      hr: 'onHeadersReceived',
-      brd: 'onBeforeRedirect',
-      rs: 'onResponseStarted',
-      c: 'onCompleted',
-      eo: 'onErrorOccurred'
-    },
-
     monitorFilter: '',
 
     monitorRange: {
@@ -71,10 +51,17 @@ $.extend(Network.prototype,
         chrome.webRequest[moment].addListener(function (details) {
           // 监听chross设置的crossIframeURL，减少对原始页面network统计的影响
           if (self.config.monitorFilter.exec(details.url) === null && details.tabId > -1) {
-            self.handler(moment, {
-              url: details.url,
-              details: details
-            }, details.tabId)
+            var viewStores = self.chross.cache.tabsMap[details.tabId].viewStores
+            var currentViewStore = viewStores[viewStores.length - 1]
+            if (details.type === 'other') {
+              currentViewStore._locked = true
+            }
+            else if (self.chross.cache.tabsMap[details.tabId]) {
+              self.handler(moment, {
+                url: details.url,
+                details: details
+              }, details.tabId)
+            }
           }
         }, self.monitorRange)
       })
@@ -105,7 +92,7 @@ $.extend(Network.prototype,
 
     init: function () {
       var self = this
-      
+
       // 避免在本地单元测试时启动chrome上的webRequest
       if (self.chross !== undefined && !self.chross['onlyBoot']) {
         if (self.boot !== null) {
