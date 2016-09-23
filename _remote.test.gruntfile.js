@@ -21,16 +21,24 @@ function makeCopy(config) {
       return fs.statSync(path.join(sourceDir, file)).isDirectory()
     })
     .forEach(function (dir) {
-      var taskName = dir + 'Copy'
+      var taskName = dir + '-Copy'
+
+      var cwd = path.join(sourceDir, dir, modulesDir)
+      var dest = path.join(config.destinationDir, dir, modulesDir)
+
+      if (dir === 'web_modules') {
+        cwd = path.join(sourceDir, dir)
+        dest = path.join(config.destinationDir, dir)
+      }
 
       result.tasks.push('copy:' + taskName)
 
       result.copy[taskName] = {
         files: [{
           expand: true,
-          cwd: path.join(sourceDir, dir, modulesDir),
+          cwd: cwd,
           src: ['*.js'],
-          dest: path.join(config.destinationDir, dir, modulesDir)
+          dest: dest
         }]
       }
     })
@@ -51,7 +59,13 @@ function makeClean(config) {
       return fs.statSync(path.join(destinationDir, file)).isDirectory()
     })
     .forEach(function (dir) {
-      result.clean.push(path.join(destinationDir, dir, modulesDir))
+      var cleanDir = path.join(destinationDir, dir, modulesDir)
+
+      if (dir == 'web_modules') {
+        cleanDir = path.join(destinationDir, dir)
+      }
+      
+      result.clean.push(cleanDir)
     })
 
   return result

@@ -15,7 +15,7 @@ function makeEntry(config) {
 
   fs.readdirSync(sourceDir)
     .filter(function (file) {
-      return fs.statSync(path.join(sourceDir, file)).isDirectory()
+      return fs.statSync(path.join(sourceDir, file)).isDirectory() && file !== 'web_modules'
     })
     .forEach(function (dir) {
       var dir = dir
