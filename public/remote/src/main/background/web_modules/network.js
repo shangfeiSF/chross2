@@ -51,17 +51,21 @@ $.extend(Network.prototype,
         chrome.webRequest[moment].addListener(function (details) {
           // 监听chross设置的crossIframeURL，减少对原始页面network统计的影响
           if (self.config.monitorFilter.exec(details.url) === null && details.tabId > -1) {
-            var viewStores = self.chross.cache.tabsMap[details.tabId].viewStores
+            var tabStore = self.chross.cache.tabsMap[details.tabId]
+            if (tabStore === undefined) return false
+
+            var viewStores = tabStore.viewStores
             var currentViewStore = viewStores[viewStores.length - 1]
-            if (details.type === 'other') {
-              currentViewStore._locked = true
+
+            if (details.type === 'other' && currentViewStore._openedDevTool === undefined) {
+              currentViewStore._openedDevTool = true
             }
-            else if (self.chross.cache.tabsMap[details.tabId]) {
-              self.handler(moment, {
-                url: details.url,
-                details: details
-              }, details.tabId)
-            }
+
+            self.handler(moment, {
+              url: details.url,
+              details: details
+            }, details.tabId)
+
           }
         }, self.monitorRange)
       })

@@ -205,6 +205,16 @@ $.extend(Cache.prototype,
       var self = this
 
       chrome.tabs.onCreated.addListener(function (tab) {
+        var filterResult = self.chross.urlFilter.ignore({
+          url: tab.url
+        })
+        if (filterResult.length) {
+          filterResult.forEach(function (match) {
+            var msg = '%cIgnore url: ' + match.shift()
+            console.log(msg, 'color: #ff4400; font-weight: bold;')
+          })
+          return false
+        }
         /*
          * 只要新打开一个标签页，就需要新建tabStore对象和userTabStore对象
          * 并且初始化一个viewStores数组和一个userViewStores数组（打上时间戳timeStamp）

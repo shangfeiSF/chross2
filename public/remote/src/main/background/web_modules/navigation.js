@@ -74,7 +74,7 @@ $.extend(Navigation.prototype, {
 
         chrome.tabs[fname](info.tabId, config, function () {
             var message = ['%c[Injected async ' + type + ']---', content.url].join('')
-            console.log(message, 'color: #1dbe1a; font-weight: bold;')
+            console.log(message, 'color: #da1f9f; font-weight: bold;')
           }
         )
       })
@@ -123,33 +123,6 @@ $.extend(Navigation.prototype, {
     actions.length && actions[0]()
   },
 
-  ignoreFromTypeIsOther: function (tabId) {
-    var self = this
-
-    var tabsMap = self.chross.cache.tabsMap
-    var tabStore = tabsMap[tabId]
-    var length = tabStore.viewStores.length
-
-    if (!length) return false
-
-    var lastestViewStore = tabStore.viewStores[length - 1]
-    momentsConfig.moments.forEach(function (moment) {
-      if (lastestViewStore.hasOwnProperty(moment)) {
-        var index = null
-
-        var item = lastestViewStore[moment]
-        for (var i = 0; i < item.length; i++) {
-          if (item[i].details.type === 'other') {
-            index = i
-            break
-          }
-        }
-
-        index && (lastestViewStore[moment] = lastestViewStore[moment].slice(0, index))
-      }
-    })
-  },
-
   onBeforeNavigate: function () {
     var self = this
 
@@ -163,6 +136,17 @@ $.extend(Navigation.prototype, {
 
     chrome.webNavigation.onCommitted.addListener(function (details) {
       if (details.frameId !== 0) return false
+
+      var filterResult = self.chross.urlFilter.ignore({
+        url: details.url
+      })
+      if (filterResult.length) {
+        filterResult.forEach(function (match) {
+          var msg = '%cIgnore url: ' + match.shift()
+          console.log(msg, 'color: #ff4400; font-weight: bold;')
+        })
+        return false
+      }
 
       self.syncInjectCss(details.tabId)
       self.asyncInjectCss(details.tabId)
@@ -186,8 +170,16 @@ $.extend(Navigation.prototype, {
     chrome.webNavigation.onCompleted.addListener(function (details) {
       if (details.frameId !== 0) return false
 
-      // 避免chrome-dev-tools增干扰网络请求的统计结果
-      self.ignoreFromTypeIsOther(details.tabId)
+      var filterResult = self.chross.urlFilter.ignore({
+        url: details.url
+      })
+      if (filterResult.length) {
+        filterResult.forEach(function (match) {
+          var msg = '%cIgnore url: ' + match.shift()
+          console.log(msg, 'color: #ff4400; font-weight: bold;')
+        })
+        return false
+      }
 
       var port = self.chross.port.getPortByTabId(details.tabId)
 

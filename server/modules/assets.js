@@ -17,5 +17,12 @@ module.exports = {
     app.use(express.static(path.join(rootDir, config.dirs.publicDir)))
     app.use(express.static(path.join(rootDir, config.dirs.remoteDir)))
     app.use(express.static(path.join(rootDir, config.dirs.webSiteDir)))
+
+    app.get('/noFound.js', function (req, res) {
+      setTimeout(function () {
+        res.writeHead(404)
+        res.end('noFound 404')
+      }, 3000)
+    })
   }
 }

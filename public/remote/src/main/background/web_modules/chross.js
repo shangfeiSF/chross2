@@ -5,6 +5,7 @@ var Agent = require('agent')
 var Network = require('network')
 var Navigation = require('navigation')
 var Loader = require('loader')
+var urlFilter = require('urlFilter')
 
 function Chross(config) {
   var config = config || {}
@@ -48,6 +49,8 @@ $.extend(Chross.prototype, {
 
   boot: function () {
     var self = this
+
+    self.urlFilter = new urlFilter(this)
 
     self.cache = new Cache(this)
 

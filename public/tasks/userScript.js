@@ -11,7 +11,7 @@ probe.runCodeInIframe(
     if (body) {
       var imgs = document.querySelectorAll('img')
       for (var i = 0; i < imgs.length; i++) {
-        imgs[i].setAttribute('src', 'http://wwc.alicdn.com/avatar/getAvatar.do?userNick=johnny2008bupt&width=80&height=80&type=sns&_input_charset=UTF-8')
+        imgs[i].setAttribute('src', 'https://wwc.alicdn.com/avatar/getAvatar.do?userNick=johnny2008bupt&width=80&height=80&type=sns&_input_charset=UTF-8')
       }
       return {
         tip: 'replace completed!'
@@ -52,8 +52,8 @@ $.when(
 })
 
 setTimeout(function () {
-  chross.navigation.urlChange('http://localhost/entry.html')
+  chross.navigation.urlChange('https://www.baidu.com/')
     .then(function (result) {
-      window.location.href = 'http://localhost/entry.html'
+      window.location.href = 'https://www.baidu.com/'
     })
-}, 300000)
+}, 4000)
