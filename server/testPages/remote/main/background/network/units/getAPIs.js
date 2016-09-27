@@ -41,10 +41,10 @@ $.extend(Suite.prototype, {
               var item = result[moment]
 
               var msg = ['Passed：', '在 All BVS 中 get 网络时刻', moment, '的详情'].join('')
-              assert.strictEqual(item.length, 5, msg)
+              assert.strictEqual(item.data.length, 5, msg)
 
               var msg = ['Passed：', '检查在 All BVS 中 get 网络时刻', moment, '的详情等于', expected[moment]].join('')
-              assert.deepEqual(item, expected[moment], msg)
+              assert.deepEqual(item.data, expected[moment], msg)
             })
           }
 
@@ -85,10 +85,10 @@ $.extend(Suite.prototype, {
               var item = result[moment]
 
               var msg = ['Passed：', '在 Current BVS 中 get 网络时刻', moment, '的详情'].join('')
-              assert.notStrictEqual(item, undefined, msg)
+              assert.notStrictEqual(item.data, undefined, msg)
 
               var msg = ['Passed：', '检查在 Current BVS 中 get 网络时刻', moment, '的详情等于', expected[moment][expected[moment].length - 1]].join('')
-              assert.deepEqual(item, expected[moment][expected[moment].length - 1], msg)
+              assert.deepEqual(item.data, expected[moment][expected[moment].length - 1], msg)
             })
           }
 
@@ -129,10 +129,10 @@ $.extend(Suite.prototype, {
               var item = result[moment]
 
               var msg = ['Passed：', '在 Specific BVS[', specificIndex, '] 中 get 网络时刻', moment, '的详情'].join('')
-              assert.notStrictEqual(item, undefined, msg)
+              assert.notStrictEqual(item.data, undefined, msg)
 
               var msg = ['Passed：', '检查在 Specific BVS[', specificIndex, '] 中 get 网络时刻', moment, '的详情等于', expected[moment][specificIndex]].join('')
-              assert.deepEqual(item, expected[moment][specificIndex], msg)
+              assert.deepEqual(item.data, expected[moment][specificIndex], msg)
             })
           }
 

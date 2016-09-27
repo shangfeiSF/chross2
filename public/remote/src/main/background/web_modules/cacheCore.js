@@ -277,7 +277,8 @@ module.exports = {
 
         var currentVS = tabStore.viewStores[tabStore.viewStores.length - 1]
         if (!currentVS) return {
-          msg: self.msg.noneViewStore('current', tabId)
+          msg: self.msg.noneViewStore('current', tabId),
+          data: null
         }
 
         var result = {

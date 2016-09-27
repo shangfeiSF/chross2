@@ -113,7 +113,7 @@ module.exports = {
             })
           }
           else {
-            details[moment] = result
+            details[moment] = result.data
           }
         })
 
@@ -128,7 +128,7 @@ module.exports = {
           var result = self.chross.cache.getInCurrentBVS(moment, tabId)
 
           if (result.data !== null) {
-            details[moment] = result.data.key === undefined ? result : {
+            details[moment] = result.data.key === undefined ? result.data : {
               key: result.data.key,
               value: result.data.value.filter(function (request) {
                 return pattern.exec(request.url) !== null
@@ -136,7 +136,7 @@ module.exports = {
             }
           }
           else {
-            details[moment] = result
+            details[moment] = result.data
           }
         })
 
@@ -151,7 +151,7 @@ module.exports = {
           var result = self.chross.cache.getInSpecificBVS(moment, index, tabId)
 
           if (result.data !== null) {
-            details[moment] = result.data.key === undefined ? result : {
+            details[moment] = result.data.key === undefined ? result.data : {
               key: result.data.key,
               value: result.data.value.filter(function (request) {
                 return pattern.exec(request.url) !== null
@@ -159,10 +159,8 @@ module.exports = {
             }
           }
           else {
-            details[moment] = result
+            details[moment] = result.data
           }
-
-
         })
 
         return details
