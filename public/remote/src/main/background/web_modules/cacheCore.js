@@ -1,5 +1,6 @@
 // tabId 设计为APIs最后一个形参的目的：保证只有形参列表完整时才能正确找到tabStore
 module.exports = {
+  // derivedGroups列出需要衍生的API-group，在cache.boot方法中使用
   derivedGroups: [
     'setAPIs',
     'recordAPIs',
@@ -8,8 +9,13 @@ module.exports = {
     'getViewAPIs'
   ],
 
+  /*
+   * 全部API的map参数会在cache.boot()方法中bind，取值tabsMap或者userTabsMap
+   * 全部API返回{ msg: …… , data: …… }
+   * */
   groups: {
-    // map(tabId)的allViewStore、currentViewStore、specificViewStore中设置key-value型数据
+    // 在map(tabId)的allViewStores、currentViewStore、specificViewStore中
+    // 设置key-value型数据
     setAPIs: {
       setInAllVS: function (map, key, value, tabId) {
         var self = this
@@ -35,6 +41,7 @@ module.exports = {
           data: tabStore.viewStores
         }
       },
+
       setInCurrentVS: function (map, key, value, tabId) {
         var self = this
         var map = self[map]
@@ -57,6 +64,7 @@ module.exports = {
           data: currentVS
         }
       },
+
       setInSpecificVS: function (map, key, value, index, tabId) {
         var self = this
         var map = self[map]
@@ -81,7 +89,8 @@ module.exports = {
         }
       }
     },
-    // map(tabId)的allViewStore、currentViewStore、specificViewStore中添加一条记录型数据
+    // 在map(tabId)的allViewStores、currentViewStore、specificViewStore中
+    // 添加一条记录型数据
     recordAPIs: {
       recordInAllVS: function (map, library, record, tabId) {
         var self = this
@@ -108,6 +117,7 @@ module.exports = {
           data: tabStore.viewStores
         }
       },
+
       recordInCurrentVS: function (map, library, record, tabId) {
         var self = this
         var map = self[map]
@@ -131,6 +141,7 @@ module.exports = {
           data: currentVS
         }
       },
+
       recordInSpecificVS: function (map, library, record, index, tabId) {
         var self = this
         var map = self[map]
@@ -156,7 +167,8 @@ module.exports = {
         }
       }
     },
-    // map(tabId)的allViewStore、currentViewStore、specificViewStore中检查指定属性的存在性
+    // 在map(tabId)的allViewStores、currentViewStore、specificViewStore中
+    // 检查指定属性prop的存在性
     existsAPIs: {
       existsInAllVS: function (map, prop, tabId) {
         var self = this
@@ -182,6 +194,7 @@ module.exports = {
           data: exists
         }
       },
+
       existsInCurrentVS: function (map, prop, tabId) {
         var self = this
         var map = self[map]
@@ -204,6 +217,7 @@ module.exports = {
           data: exists
         }
       },
+
       existsInSpecificVS: function (map, prop, index, tabId) {
         var self = this
         var map = self[map]
@@ -228,7 +242,8 @@ module.exports = {
         }
       }
     },
-    // map(tabId)的allViewStore、currentViewStore、specificViewStore中获取指定的属性值
+    // 在map(tabId)的allViewStores、currentViewStore、specificViewStore中
+    // 获取指定属性key的值
     getAPIs: {
       getInAllVS: function (map, key, tabId) {
         var self = this
@@ -265,6 +280,7 @@ module.exports = {
           data: result
         }
       },
+
       getInCurrentVS: function (map, key, tabId) {
         var self = this
         var map = self[map]
@@ -297,6 +313,7 @@ module.exports = {
           data: result
         }
       },
+
       getInSpecificVS: function (map, key, index, tabId) {
         var self = this
         var map = self[map]
@@ -330,7 +347,7 @@ module.exports = {
         }
       },
     },
-    // map(tabId)的allViewStore、currentViewStore、specificViewStore
+    // 获取map(tabId)的allViewStores、currentViewStore、specificViewStore
     getViewAPIs: {
       getAllVS: function (map, tabId) {
         var self = this
@@ -352,6 +369,7 @@ module.exports = {
           data: tabStore.viewStores
         }
       },
+
       getCurrentVS: function (map, tabId) {
         var self = this
         var map = self[map]
@@ -364,7 +382,8 @@ module.exports = {
 
         var currentVS = tabStore.viewStores[tabStore.viewStores.length - 1]
         if (!currentVS) return {
-          msg: self.msg.noneViewStore('current', tabId)
+          msg: self.msg.noneViewStore('current', tabId),
+          data: null
         }
 
         return {
@@ -372,6 +391,7 @@ module.exports = {
           data: currentVS
         }
       },
+
       getSpecificVS: function (map, index, tabId) {
         var self = this
         var map = self[map]

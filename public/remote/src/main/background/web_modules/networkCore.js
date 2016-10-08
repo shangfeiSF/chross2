@@ -1,5 +1,6 @@
 // tabId 设计为APIs最后一个形参的目的：保证只有形参列表完整时才能正确找到tabStore
 module.exports = {
+  // derivedGroups列出需要衍生的API-group，在network.boot方法中使用
   derivedGroups: [
     'existsAPIs',
     'getAPIs',
@@ -33,6 +34,7 @@ module.exports = {
 
         return exists
       },
+
       existsInCurrentBVS: function (moments, tabId) {
         var self = this
         var exists = {}
@@ -43,6 +45,7 @@ module.exports = {
 
         return exists
       },
+
       existsInSpecificBVS: function (moments, index, tabId) {
         var self = this
         var exists = {}
@@ -66,6 +69,7 @@ module.exports = {
 
         return details
       },
+
       getInCurrentBVS: function (moments, tabId) {
         var self = this
         var details = {}
@@ -76,6 +80,7 @@ module.exports = {
 
         return details
       },
+
       getInSpecificBVS: function (moments, index, tabId) {
         var self = this
         var details = {}
@@ -119,6 +124,7 @@ module.exports = {
 
         return details
       },
+
       filterInCurrentBVS: function (moments, pattern, tabId) {
         var self = this
         var pattern = new RegExp(pattern)
@@ -142,6 +148,7 @@ module.exports = {
 
         return details
       },
+
       filterInSpecificBVS: function (moments, pattern, index, tabId) {
         var self = this
         var pattern = new RegExp(pattern)

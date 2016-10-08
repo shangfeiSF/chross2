@@ -5,7 +5,7 @@ function urlFilter(chross, config) {
 
   var defaultConfig = {}
 
-  this.config = $.extend(true, defaultConfig, config)
+  this.config = $.extend(true, {}, defaultConfig, config)
 
   this.chross = chross
 
@@ -14,12 +14,14 @@ function urlFilter(chross, config) {
 
 $.extend(urlFilter.prototype, {
     ignore: function (config) {
-      var config = config || {}
       var result = []
-      var urls = ignoreUrls.concat(config.extraIgnoreUrls || [])
 
-      urls.forEach(function (url) {
-        var matches = config.url.match(url)
+      var config = config || {}
+      var url = config.url || ''
+      var extraIgnoreUrls = config.extraIgnoreUrls || []
+
+      ignoreUrls.concat(extraIgnoreUrls).forEach(function (ignoreUrl) {
+        var matches = url.match(ignoreUrl)
 
         if (matches && matches.length) {
           result.push(matches)

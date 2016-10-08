@@ -5,21 +5,23 @@ function Navigation(chross, config) {
 
   var defaultConfig = {}
 
-  this.config = $.extend(true, defaultConfig, config)
+  this.config = $.extend(true, {}, defaultConfig, config)
 
   this.listenerInfosMap = {}
-  
+
   this.chross = chross
-  
+
   this.init()
 }
 
 $.extend(Navigation.prototype,
+  // chross.navigation提供的API
   {
     urlChange: function (url) {
       var self = this
       var port = self.chross.port
 
+      // 一次urlChange一次回调，故使用promise实现回调
       var listener = $.Deferred()
 
       self.register(listener)
@@ -67,6 +69,7 @@ $.extend(Navigation.prototype,
 
     init: function () {
     }
-  })
+  }
+)
 
 module.exports = Navigation

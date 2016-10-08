@@ -5,12 +5,12 @@ function Cache(chross, config) {
 
   var defaultConfig = {}
 
-  this.config = $.extend(defaultConfig, config)
+  this.config = $.extend(true, {}, defaultConfig, config)
 
-  // 客户只读
+  // user read-only
   this.tabsMap = {}
 
-  // 客户可读可写
+  // user readable and writable
   this.userTabsMap = {}
 
   this.chross = chross
@@ -61,7 +61,7 @@ $.extend(Cache.prototype,
       UVS: 'The viewStore taht admins by user himself, user is readable and writable naturally.'
     }
   },
-  // 管理tabStore viewStore，保证viewStore准确性的方法
+  // 管理tabStore和viewStores，保证viewStore和实际pv可以吻合
   {
     inspectActiveTab: function (tabId) {
       var defer = $.Deferred()
@@ -192,6 +192,12 @@ $.extend(Cache.prototype,
             delete userViewStore.waiting
           }
           else {
+            /*
+             *  直接在chrome地址栏重载或者刷新页面
+             *  可能会造成viewStore数据的混乱！！
+             *  强烈建议先使用chross.navigation.urlChange()通知chross的background即将到来的urlChange
+             *  然后在.then()中使用window.location来改变url
+             * */
             self.createViewStore({
               id: tabId,
               url: details.url
@@ -216,16 +222,25 @@ $.extend(Cache.prototype,
           return false
         }
         /*
-         * 只要新打开一个标签页，就需要新建tabStore对象和userTabStore对象
-         * 并且初始化一个viewStores数组和一个userViewStores数组（打上时间戳timeStamp）
-         * waiting = true 表示该store正在等待存储数据
-         * delete waiting 后将表示该store已经开始存储数据（避免这种类型的私有数据在用户使用时暴露出去）
-         *  一旦创建新的标签页或者使用chross.navigation.urlChange()
-         * 都会创建一个新的viewStore和一个新的userViewStore（由onTabCreated或者createViewStore完成）
-         * 并设置 waiting = true，保证在之后的 onBeforeNavigate 中不再创建新的store
-         * 而是直接启用 waiting = true 的viewStore，并 delete waiting
+         * 只要新打开一个标签页，就需要clearTabStore新建一个tabStore对象和一个userTabStore对象
+         * tabStore对象和userTabStore对象都初始化一个viewStores数组，并打上timeStamp时间戳
          * */
         self.createTabStore(tab)
+        /*
+         * createViewStore: function (tab, isWaiting)
+         * createViewStore的isWaiting参数传入true，新建的viewStore设置waiting=true，表示新建的viewStore正在等待存储数据
+         *
+         * 在onBeforeNavigate方法中会检查最新的viewStore
+         * 存在waiting=true的viewStore时，直接delete waiting，表示该viewStore已经可以开始存储数据，同时避免这种类型的私有数据暴露出去
+         * 不存在waiting=true的viewStore时，需要新建viewStore设置waiting=true，表示新建的viewStore无需等待，可以直接存储数据
+         *
+         *  创建新的标签页时，由onTabCreated方法会新建tabStore，新建viewStore
+         *  使用chross.navigation.urlChange()时，直接调用createViewStore方法，在当前的tabStore的viewStores数组中，新建viewStore
+         *  上述两种情况都会传入参数isWaiting = true，
+         *  新建viewStore中waiting = true，如此保证在之后的onBeforeNavigate方法中不再新建viewStore
+         *  先delete waiting属性，然后直接启用最新viewStore存储数据
+         *
+         * */
         self.createViewStore(tab, true)
       })
     },
@@ -248,7 +263,9 @@ $.extend(Cache.prototype,
 
       Object.keys(cacheCore.groups).forEach(function (group) {
         if (cacheCore.derivedGroups.indexOf(group) > -1) {
-          Object.keys(cacheCore.groups[group]).forEach(function (API) {
+          var APIs = cacheCore.groups[group]
+
+          Object.keys(APIs).forEach(function (API) {
             var description = API.match(/\b(\w+)(?=VS\b)/g)
 
             if (description && description.length == 1) {

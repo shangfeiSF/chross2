@@ -1,5 +1,6 @@
 module.exports = {
-  executionRegistry: {
+  // 统计任务注册表
+  taskRegistries: {
     onBeforeRequest: ['cnesusFrameDetails'],
     onBeforeSendHeaders: [],
     onSendHeaders: [],
@@ -10,6 +11,7 @@ module.exports = {
     onErrorOccurred: []
   },
 
+  // 统计方法
   taskHandlers: {
     cnesusFrameDetails: function (details) {
       var self = this

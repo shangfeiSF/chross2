@@ -52,8 +52,8 @@ $.when(
 })
 
 setTimeout(function () {
-  chross.navigation.urlChange('https://www.baidu.com/')
+  chross.navigation.urlChange('http://localhost/entry.html')
     .then(function (result) {
-      window.location.href = 'https://www.baidu.com/'
+      window.location.href = 'http://localhost/entry.html'
     })
-}, 4000)
+}, 5000000)

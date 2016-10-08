@@ -1,11 +1,11 @@
-var Port = require('port')
-var Probe = require('probe')
+var urlFilter = require('urlFilter')
 var Cache = require('cache')
-var Agent = require('agent')
 var Network = require('network')
 var Navigation = require('navigation')
+var Probe = require('probe')
+var Agent = require('agent')
+var Port = require('port')
 var Loader = require('loader')
-var urlFilter = require('urlFilter')
 
 function Chross(config) {
   var config = config || {}
@@ -14,9 +14,16 @@ function Chross(config) {
     crossIframeURL: '//gtms04.alicdn.com/tps/i4/TB1vX.wKVXXXXX7XXXX_RF9JFXX-1-1.gif'
   }
 
-  this.config = $.extend(defaultConfig, config)
+  this.config = $.extend(true, {}, defaultConfig, config)
 
-  this.commonCode = 'var chross = window.chross; var $ = window.$;'
+  this.commonCode = [
+    '/* This is common code injected by chross */',
+    'var chross = window.chross;',
+    'var $ = window.$;',
+    'console.log("%cInjected user content", "color: #00ff00; font-weight: bold;");',
+    '/* This is code injected by user */',
+    '',
+  ].join('\n')
 
   this.userScript = ''
 

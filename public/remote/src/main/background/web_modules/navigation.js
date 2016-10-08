@@ -1,12 +1,11 @@
 var message = require('message')
-var momentsConfig = require('momentsConfig')
 
 function Navigation(chross, config) {
   var config = config || {}
 
   var defaultConfig = {}
 
-  this.config = $.extend(defaultConfig, config)
+  this.config = $.extend(true, {}, defaultConfig, config)
 
   this.content = {
     // 异步非阻塞的方式注入多个脚本（脚本注入的顺序与数组中声明的顺序无关）
@@ -73,7 +72,7 @@ $.extend(Navigation.prototype, {
         config.code = code
 
         chrome.tabs[fname](info.tabId, config, function () {
-            var message = ['%c[Injected async ' + type + ']---', content.url].join('')
+            var message = ['%c[Injected async ' + (type ? 'script' : 'css') + '] --- ', content.url].join('')
             console.log(message, 'color: #da1f9f; font-weight: bold;')
           }
         )
@@ -108,7 +107,7 @@ $.extend(Navigation.prototype, {
             config.code = code
 
             chrome.tabs[fname](info.tabId, config, function () {
-                var message = ['%c[Injected sync ' + type + ']---', info.url].join('')
+                var message = ['%c[Injected sync ' + (type ? 'script' : 'css') + '] --- ', info.url].join('')
                 console.log(message, 'color: #2b9dff; font-weight: bold;')
 
                 var next = actions[info.index + 1]
@@ -137,6 +136,7 @@ $.extend(Navigation.prototype, {
     chrome.webNavigation.onCommitted.addListener(function (details) {
       if (details.frameId !== 0) return false
 
+      // 过滤一些特殊的协议
       var filterResult = self.chross.urlFilter.ignore({
         url: details.url
       })
@@ -170,6 +170,7 @@ $.extend(Navigation.prototype, {
     chrome.webNavigation.onCompleted.addListener(function (details) {
       if (details.frameId !== 0) return false
 
+      // 过滤一些特殊的协议
       var filterResult = self.chross.urlFilter.ignore({
         url: details.url
       })
@@ -200,11 +201,13 @@ $.extend(Navigation.prototype, {
   boot: function () {
     var self = this
 
-    self.asyncInjectScripts = self.asyncInject.bind(self, true)
-    self.syncInjectScripts = self.syncInject.bind(self, true)
+    /* 注入脚本API */
+    self.asyncInjectScripts = self.asyncInject.bind(self, true) // 异步无阻塞
+    self.syncInjectScripts = self.syncInject.bind(self, true) // 同步阻塞
 
-    self.asyncInjectCss = self.asyncInject.bind(self, false)
-    self.syncInjectCss = self.syncInject.bind(self, false)
+    /* 注入样式表API */
+    self.asyncInjectCss = self.asyncInject.bind(self, false) // 异步无阻塞
+    self.syncInjectCss = self.syncInject.bind(self, false) // 同步阻塞
   },
 
   init: function () {

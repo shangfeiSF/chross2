@@ -13,26 +13,18 @@ function Port(chross) {
 }
 
 $.extend(Port.prototype, {
-  init: function () {
-    var self = this
-
-    self.ports.top = chrome.runtime.connect({
-      name: self.ports.top
-    })
-
-    self.monitorTopPort()
-  },
-
   monitorTopPort: function () {
     var self = this
     var chross = self.chross
 
     self.ports.top.onMessage.addListener(function (msg) {
       if (msg.type == 'notice') {
+        // notice类型直接打印
         console.log(msg)
       }
 
       if (msg.type == 'response') {
+        // response类型需要传递给对应的模块
         switch (msg.sign.module) {
           case chross.probe.constructor.name:
             chross.probe.resolve(msg)
@@ -55,6 +47,17 @@ $.extend(Port.prototype, {
     var self = this
 
     self.ports.top.postMessage(details)
+  },
+
+  init: function () {
+    var self = this
+
+    // 建立顶层port
+    self.ports.top = chrome.runtime.connect({
+      name: self.ports.top
+    })
+
+    self.monitorTopPort()
   }
 })
 

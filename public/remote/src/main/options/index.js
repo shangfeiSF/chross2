@@ -44,5 +44,4 @@ $.extend(Page.prototype, {
 
 var page = new Page()
 
-debugger
 page.init()

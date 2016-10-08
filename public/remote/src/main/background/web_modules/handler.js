@@ -5,7 +5,7 @@ function Handler(chross, config) {
 
   var defaultConfig = {}
 
-  this.config = $.extend(true, defaultConfig, config)
+  this.config = $.extend(true, {}, defaultConfig, config)
 
   this.chross = chross
 

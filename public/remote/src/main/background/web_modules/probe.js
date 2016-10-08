@@ -5,7 +5,7 @@ function Probe(chross, config) {
 
   var defaultConfig = {}
 
-  this.config = $.extend(true, defaultConfig, config)
+  this.config = $.extend(true, {}, defaultConfig, config)
 
   this.chross = chross
 
@@ -17,11 +17,11 @@ $.extend(Probe.prototype, {
     var self = this
 
     chrome.webRequest.onBeforeRequest.addListener(function (details) {
-      var port = self.chross.port.getPortByTabId(details.tabId)
-
+      // 解析URL中__r_e_s_u_l_t__携带的执行结果
       var result = decodeURIComponent(details.url.split('__r_e_s_u_l_t__=').pop())
       result = JSON.parse(result)
 
+      // 拼接发送给注入脚本的msg和output
       var msg = {
         sign: result.sign,
         command: 'runCodeInIframe',
@@ -39,6 +39,9 @@ $.extend(Probe.prototype, {
         status: 'success'
       }
 
+      // 通过port发送到注入脚本
+      var port = self.chross.port.getPortByTabId(details.tabId)
+
       port && port.postMessage(message.response(msg, output))
     }, options, ["blocking"])
   },
@@ -46,6 +49,7 @@ $.extend(Probe.prototype, {
   init: function () {
     var self = this
 
+    // 监听在iframe中执行代码后用于回传执行结果的URL
     self.monitorCrossIframeUrl({
       urls: [['*:', self.chross.config.crossIframeURL, '*'].join('')]
     })

@@ -1,7 +1,7 @@
 var Port = require('port')
 var Probe = require('probe')
-var Network = require('network')
 var Navigation = require('navigation')
+var Network = require('network')
 
 function Chross(config) {
   var config = config || {}
@@ -10,7 +10,7 @@ function Chross(config) {
     crossIframeURL: '//gtms04.alicdn.com/tps/i4/TB1vX.wKVXXXXX7XXXX_RF9JFXX-1-1.gif'
   }
 
-  this.config = $.extend(true, defaultConfig, config)
+  this.config = $.extend(true, {}, defaultConfig, config)
 }
 
 $.extend(Chross.prototype, {

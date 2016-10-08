@@ -17,11 +17,15 @@ function Network(chross, config) {
 
 $.extend(Network.prototype,
   momentsConfig,
+
+  // chross.network提供的exists类型API
   {
     existsInAllViews: function (moments) {
       var self = this
       var port = self.chross.port
 
+      // 一次existsInAllViews一次回调，故使用promise实现回调
+      // 以下API同理使用promise实现回调
       var listener = $.Deferred()
 
       self.register(listener)
@@ -79,6 +83,7 @@ $.extend(Network.prototype,
       return listener.promise()
     }
   },
+  // chross.network提供的get类型API
   {
     getInAllViews: function (moments) {
       var self = this
@@ -141,6 +146,7 @@ $.extend(Network.prototype,
       return listener.promise()
     }
   },
+  // chross.network提供的filter类型API
   {
     filterInAllViews: function (moments, pattern) {
       var self = this

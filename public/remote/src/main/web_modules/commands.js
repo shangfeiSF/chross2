@@ -1,5 +1,5 @@
 module.exports = {
-  // 命令：API
+  // 命令名：实体方法名
   identity: 'identity',
   ajax: 'ajax',
   ping: 'ping',

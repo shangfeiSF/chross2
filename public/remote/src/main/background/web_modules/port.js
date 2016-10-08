@@ -5,8 +5,9 @@ function Port(chross, config) {
 
   var defaultConfig = {}
 
-  this.config = $.extend(true, defaultConfig, config)
+  this.config = $.extend(true, {}, defaultConfig, config)
 
+  // tabId 与 port 唯一对应
   this.ports = {}
 
   this.chross = chross
@@ -21,11 +22,10 @@ $.extend(Port.prototype, {
     var port = port
 
     port.onMessage.addListener(function (msg) {
-      var handler = self.chross.agent.handler
       var action = self.chross.agent.findAction(msg.command)
 
       if (action) {
-        handler[action](msg.params || {}, msg.data || {}, port.sender)
+        self.chross.agent.handler[action](msg.params || {}, msg.data || {}, port.sender)
           .then(function (output) {
             output && port.postMessage(message.response(msg, output))
           })

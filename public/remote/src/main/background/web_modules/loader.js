@@ -3,7 +3,7 @@ function Loader(chross, config) {
 
   var defaultConfig = {}
 
-  this.config = $.extend(defaultConfig, config)
+  this.config = $.extend(true, {}, defaultConfig, config)
 
   this.chross = chross
 }
@@ -36,7 +36,7 @@ $.extend(Loader.prototype, {
           url: self.chross.urlsList[0],
           active: true
         }, function (tab) {
-          var message = '%cGot UserScript and urlsList'
+          var message = '%cGot UserScript and urlsList and open url: ' + self.chross.urlsList[0]
           console.log(message, 'color: #00ff00; font-weight: bold;')
         })
       })

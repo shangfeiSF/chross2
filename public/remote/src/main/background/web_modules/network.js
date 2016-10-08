@@ -7,12 +7,9 @@ function Network(chross, config) {
 
   var defaultConfig = {}
 
-  this.config = $.extend(true, defaultConfig, config)
+  this.config = $.extend(true, {}, defaultConfig, config)
 
-  this.census = new Census(chross, {
-    moments: this.moments,
-    malias: this.malias
-  })
+  this.census = new Census(chross)
 
   this.chross = chross
 
@@ -20,11 +17,13 @@ function Network(chross, config) {
 }
 
 $.extend(Network.prototype,
+  momentsConfig,
+
   networkCore.groups.recordAPIs,
   networkCore.groups.existsAPIs,
   networkCore.groups.getAPIs,
   networkCore.groups.filterAPIs,
-  momentsConfig,
+
   {
     monitorFilter: '',
 
@@ -38,6 +37,9 @@ $.extend(Network.prototype,
       var self = this
 
       self.recordInCurrentBVS([moment], record, tabId)
+      // 执行网络统计任务
+      // 包括chross预定义的通用任务（censusCore中注册、定义的统计方法）
+      // 还包括user自定义的用户任务（self.chross.userTasks中定义的统计方法）
       self.census.tasks[moment].forEach(function (task) {
         task(record.details)
       })
@@ -50,7 +52,7 @@ $.extend(Network.prototype,
       moments.forEach(function (moment) {
         chrome.webRequest[moment].addListener(function (details) {
           // 监听chross设置的crossIframeURL，减少对原始页面network统计的影响
-          if (self.config.monitorFilter.exec(details.url) === null && details.tabId > -1) {
+          if (self.monitorFilter.exec(details.url) === null && details.tabId > -1) {
             var tabStore = self.chross.cache.tabsMap[details.tabId]
             if (tabStore === undefined) return false
 
@@ -76,11 +78,13 @@ $.extend(Network.prototype,
     boot: function () {
       var self = this
 
-      self.config.monitorFilter = new RegExp(self.chross.config.crossIframeURL)
+      self.monitorFilter = new RegExp(self.chross.config.crossIframeURL)
 
       Object.keys(networkCore.groups).forEach(function (group) {
         if (networkCore.derivedGroups.indexOf(group) > -1) {
-          Object.keys(networkCore.groups[group]).forEach(function (API) {
+          var APIs = networkCore.groups[group]
+
+          Object.keys(APIs).forEach(function (API) {
             var derivativeAPIs = {}
 
             self.moments.forEach(function (moment) {

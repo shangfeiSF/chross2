@@ -1,1 +1,1 @@
-var b = 'b2'
+var b = 'b'

@@ -1,4 +1,7 @@
 module.exports = {
+  // actions 包括全部实体方法
+  // 方法全部返回一个Promise
+  // 参数列表params, data, sender，分别传递执行参数, 待存数据, port.sender参数
   actions: {
     identity: function (params, data, sender) {
     },
@@ -176,7 +179,9 @@ module.exports = {
     }
   },
 
+  // helpers 包括全部实体方法的辅助方法
   helpers: {
+    // 拼接代码
     _assembleCode: function (params) {
       var self = this
 
@@ -185,7 +190,7 @@ module.exports = {
         'var result = {};' +
         'result.value = value;' +
         'result.sign=' + JSON.stringify(params.sign) + ';' +
-        'new Image().src="'+ self.chross.config.crossIframeURL + '?_=" + (+new Date()) +' +
+        'new Image().src="' + self.chross.config.crossIframeURL + '?_=" + (+new Date()) +' +
         '"&__r_e_s_u_l_t__=" + JSON.stringify(result);'
 
       return code

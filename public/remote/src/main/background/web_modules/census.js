@@ -6,7 +6,7 @@ function Census(chross, config) {
 
   var defaultConfig = {}
 
-  this.config = $.extend(true, defaultConfig, config)
+  this.config = $.extend(true, {}, defaultConfig, config)
 
   this.tasks = {}
 
@@ -17,12 +17,12 @@ function Census(chross, config) {
 
 $.extend(Census.prototype,
   momentsConfig,
+
   {
     merge: function () {
       var self = this
-      var moments = self.moments
 
-      moments.forEach(function (moment) {
+      momentsConfig.moments.forEach(function (moment) {
         var userTasks = self.chross.userTasks[moment]
 
         userTasks.forEach(function (task) {
@@ -33,12 +33,11 @@ $.extend(Census.prototype,
 
     boot: function () {
       var self = this
-      var moments = self.moments
 
-      moments.forEach(function (moment) {
+      momentsConfig.moments.forEach(function (moment) {
         self.tasks[moment] = new Array()
 
-        censusCore.executionRegistry[moment].forEach(function (taskName) {
+        censusCore.taskRegistries[moment].forEach(function (taskName) {
           self.tasks[moment].push(censusCore.taskHandlers[taskName].bind(self))
         })
       })
