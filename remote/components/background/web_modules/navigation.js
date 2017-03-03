@@ -10,16 +10,16 @@ function Navigation(chross, config) {
   this.content = {
     // 异步非阻塞的方式注入多个脚本（脚本注入的顺序与数组中声明的顺序无关）
     ayncScripts: [
-      {url: 'http://localhost/main/async1.bundle.js'},
-      {url: 'http://localhost/main/async2.bundle.js'},
-      {url: 'http://localhost/main/async3.bundle.js'},
-      {url: 'http://localhost/main/injection.bundle.js'},
+      {url: 'http://localhost/remote/components/async1.bundle.js'},
+      {url: 'http://localhost/remote/components/async2.bundle.js'},
+      {url: 'http://localhost/remote/components/async3.bundle.js'},
+      {url: 'http://localhost/remote/components/injection.bundle.js'},
     ],
     // 同步阻塞的方式注入多个脚本（脚本注入的顺序与数组中声明的顺序保持一致）
     syncScripts: [
-      {url: 'http://localhost/main/sync1.bundle.js'},
-      {url: 'http://localhost/main/sync2.bundle.js'},
-      {url: 'http://localhost/main/sync3.bundle.js'},
+      {url: 'http://localhost/remote/components/sync1.bundle.js'},
+      {url: 'http://localhost/remote/components/sync2.bundle.js'},
+      {url: 'http://localhost/remote/components/sync3.bundle.js'},
     ],
     // 异步非阻塞的方式注入多个样式表（样式表注入的顺序与数组中声明的顺序无关）
     ayncCss: [],
