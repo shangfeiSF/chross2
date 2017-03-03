@@ -52,8 +52,8 @@ $.when(
 })
 
 setTimeout(function () {
-  chross.navigation.urlChange('http://localhost/entry.html')
+  chross.navigation.urlChange('http://localhost/public/index.html')
     .then(function (result) {
-      window.location.href = 'http://localhost/entry.html'
+      window.location.href = 'http://localhost/public/index.html'
     })
-}, 5000000)
+}, 5000)

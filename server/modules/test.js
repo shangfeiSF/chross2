@@ -3,26 +3,11 @@ var path = require('path')
 
 var express = require('express')
 var Promise = require("bluebird")
-
 Promise.promisifyAll(fs)
 
-var config = {
-  dirs: {
-    libDir: '../server/testPages/lib',
-    testModulesDir: '../test/remote/build',
-    testUnitsDir: '../server/testPages/remote',
-
-    tabStoreDir: './tabStore'
-  }
-}
-
-
 module.exports = {
-  start: function (main) {
-    var app = main.app
-    var rootDir = main.rootDir
-
-    var tabStoreDir = path.join(rootDir, config.dirs.tabStoreDir)
+  start: function (app) {
+    var tabStoreDir = path.join(__dirname, '../tabStore')
 
     app.get('/tabstore/newest.json', function (req, res) {
       fs.readdirAsync(tabStoreDir)
@@ -73,8 +58,8 @@ module.exports = {
         })
     })
 
-    app.use(express.static(path.join(rootDir, config.dirs.libDir)))
-    app.use(express.static(path.join(rootDir, config.dirs.testModulesDir)))
-    app.use(express.static(path.join(rootDir, config.dirs.testUnitsDir)))
+    app.use(express.static(path.join(__dirname, '../testPages/lib')))
+    app.use(express.static(path.join(__dirname, '../../test/remote/build')))
+    app.use(express.static(path.join(__dirname, '../testPages/remote')))
   },
 }

@@ -8,17 +8,9 @@ var test = require('./modules/test')
 
 var app = express()
 
-var main = {
-  app: app,
-  rootDir: __dirname
-}
-
-// 启动静态资源访问服务
-assets.start(main)
-// 启动上传服务
-upload.start(main)
-// 启动模块测试服务
-test.start(main)
+assets.start(app)
+upload.start(app)
+test.start(app)
 
 app.listen(80, function () {
   console.log('[Server] -- listening localhost:80....'.green)
