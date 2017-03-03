@@ -1,17 +1,13 @@
 {
   "name": "Chross2",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "manifest_version": 2,
   "description": "Chross is Chrome and Cross，just focus on injection",
   "icons": {
     "16": "icons/16.png",
     "48": "icons/48.png",
     "128": "icons/128.png"
   },
-  "background": {
-    "page": "main/background/index.html",
-    "persistent": true
-  },
-  "options_page": "main/options/index.html",
   "browser_action": {
     "default_title": "Chross",
     "default_icon": {
@@ -21,13 +17,17 @@
   "content_security_policy": "script-src 'self' https://g.alicdn.com http://127.0.0.1 http://localhost; object-src 'self'",
   "permissions": [
     "tabs",
-    "contextMenus",
-    "webRequest",
-    "webNavigation",
-    "webRequestBlocking",
     "cookies",
     "downloads",
+    "webRequest",
+    "contextMenus",
+    "webNavigation",
+    "webRequestBlocking",
     "<all_urls>"
   ],
-  "manifest_version": 2
+  "background": {
+    "page": "background/index.html",
+    "persistent": true
+  },
+  "options_page": "options/index.html"
 }
