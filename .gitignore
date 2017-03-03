@@ -1,8 +1,6 @@
 .idea/
-public/extension/build
-public/remote/build
-test/extension/build
-test/remote/build
-server/tabStore/
 node_modules/
 npm-debug.log
+_bundle.extension_/
+_bundle.remote_/
+server/tabStore/
