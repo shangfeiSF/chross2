@@ -1,0 +1,42 @@
+#!/usr/bin/env node
+var fs = require('fs')
+var path = require('path')
+var child_process = require('child_process')
+
+var nopt = require('nopt')
+var Promise = require('bluebird')
+
+var knowns = {
+  'host': String
+}
+var shorts = {
+  '-h': ['--host']
+}
+var options = nopt(knowns, shorts, process.argv, 2)
+
+var params = []
+options.host && params.push('--host', options.host)
+
+var execAsync = Promise.promisify(child_process.exec, {
+  context: child_process,
+  multiArgs: true
+})
+
+var lib = path.join(__dirname, 'lib')
+var files = fs.readdirSync(lib)
+var gulpFile = files.filter(function (file) {
+  return path.basename(file) === path.basename(__filename) + '.gulp.js'
+}).pop()
+
+var gulpCmd = ['gulp', '--gulpfile', path.join(lib, gulpFile)].concat(params)
+execAsync(gulpCmd.join(' '), __dirname)
+  .then(
+    function (details) {
+      console.log(details[0])
+      console.log(details[1])
+    },
+    function (error) {
+      console.log(error.cmd)
+      console.log(error.message)
+    }
+  )
