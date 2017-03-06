@@ -16,14 +16,14 @@ var hash = new Hash({
   encoding: 'hex'
 })
 
-var config = {tabStoreDir: './tabStore'}
+var config = {tabStoreDir: '../tabStore'}
 
 module.exports = {
   start: function (app) {
     app.use(bodyParser.json())
     app.use(bodyParser.urlencoded({extended: true}))
 
-    app.use('/getTabStore', express.static(path.join(__dirname, '../tabStore')))
+    app.use('/getTabStore', express.static(path.join(__dirname, config.tabStoreDir)))
 
     app.post('/recordTabStore', function (req, res) {
       var form = new multiparty.Form({
@@ -40,7 +40,7 @@ module.exports = {
           var tabStore = JSON.parse(result.shift()['tabStore'].pop())
 
           return {
-            path: path.join(rootDir, config.tabStoreDir),
+            path: path.join(__dirname, config.tabStoreDir),
             name: [hash.gen(), 'json'].join('.'),
             content: JSON.stringify({
               "tabStore": tabStore

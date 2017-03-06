@@ -6,7 +6,8 @@
     "extension": "node bin/extension.build --host ",
     "remote": "node bin/remote.build --host ",
     "watch": "gulp --gulpfile bin/lib/watch.gulp.js --host ",
-    "start": "node server/app"
+    "start": "node server/app",
+    "debug": "npm run extension & npm run remote & npm start"
   },
   "description": "Cross Chrome Extensions",
   "dependencies": {

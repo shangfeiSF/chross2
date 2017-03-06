@@ -7,6 +7,8 @@ var remote = path.join(__dirname, '../../remote')
 var bundle = path.join(__dirname, '../../_bundle.remote_')
 
 module.exports = {
+  devtool: 'inline-source-map',
+
   entry: (function () {
     var components = path.join(remote, 'components')
     var entry = {}

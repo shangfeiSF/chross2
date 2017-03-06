@@ -1,4 +1,5 @@
 var cacheCore = require('cacheCore')
+var moments = require('momentsConfig').moments
 
 function Cache(chross, config) {
   var config = config || {}
@@ -134,13 +135,63 @@ $.extend(Cache.prototype,
       userTabStore.viewStores.push(userViewStore)
     },
 
+    formatViewStore: function (tabId) {
+      var self = this
+      var tabStore = self.tabsMap[tabId]
+
+      var formated = {
+        tabId: tabId,
+        timeStamp: tabStore.timeStamp,
+        viewStores: []
+      }
+
+      $.each(tabStore.viewStores, function (i, viewStore) {
+        var store = {
+          _openedDevTool: viewStore._openedDevTool,
+          frameIds: viewStore.frameIds,
+          frameList: viewStore.frameList,
+          protocol: viewStore.protocol,
+          timeStamp: viewStore.timeStamp,
+          requests: {}
+        }
+
+        $.each(moments, function (j, moment) {
+          if (viewStore[moment]) {
+            $.each(viewStore[moment], function (k, info) {
+              var details = info.details
+              var requestId = details.requestId
+
+              if (store.requests[requestId] === undefined) {
+                store.requests[requestId] = {
+                  url: details.url,
+                  method: details.method,
+                  frameId: details.frameId,
+                  parentFrameId: details.parentFrameId,
+                  type: details.type
+                }
+              }
+
+              store.requests[requestId][moment] = {
+                timeStamp: details.timeStamp
+              }
+            })
+          }
+        })
+
+        store.length = Object.keys(store.requests).length
+        formated.viewStores.push(store)
+      })
+
+      return formated
+    },
+
     recordTabStore: function (tabId) {
       var self = this
 
       var defer = $.Deferred()
       var promise = defer.promise()
 
-      var tabStore = self.tabsMap[tabId]
+      var tabStore = self.formatViewStore(tabId)
       tabStore = JSON.stringify(tabStore)
 
       var formData = new FormData()
