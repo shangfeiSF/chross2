@@ -1,33 +1,32 @@
 var fs = require('fs')
 var path = require('path')
 
+var Promise = require("bluebird")
+Promise.promisifyAll(fs)
 
-var Hash = require('./hash')
 var colors = require('colors')
 var express = require('express')
 var multiparty = require('multiparty')
 var bodyParser = require('body-parser')
 
-var Promise = require("bluebird")
-Promise.promisifyAll(fs)
-
+var Hash = require('./hash')
 var hash = new Hash({
   algorithms: 'RSA-SHA1-2',
   encoding: 'hex'
 })
 
-var config = {tabStoreDir: '../tabStore'}
+var routes = require('../routes')
 
 module.exports = {
   start: function (app) {
     app.use(bodyParser.json())
     app.use(bodyParser.urlencoded({extended: true}))
 
-    app.use('/getTabStore', express.static(path.join(__dirname, config.tabStoreDir)))
+    app.use(routes.getTabStore.path, express.static(routes.getTabStore.dir))
 
     app.post('/recordTabStore', function (req, res) {
       var form = new multiparty.Form({
-        'uploadDir': config.tabStoreDir
+        'uploadDir': routes.getTabStore.dir
       })
 
       var parseAsync = Promise.promisify(form.parse, {
@@ -37,13 +36,11 @@ module.exports = {
 
       parseAsync(req)
         .then(function (result) {
-          var tabStore = JSON.parse(result.shift()['tabStore'].pop())
-
           return {
-            path: path.join(__dirname, config.tabStoreDir),
+            path: routes.getTabStore.dir,
             name: [hash.gen(), 'json'].join('.'),
             content: JSON.stringify({
-              "tabStore": tabStore
+              "tabStore": JSON.parse(result.shift()['tabStore'].pop())
             }, null, 2),
             encode: 'utf8'
           }

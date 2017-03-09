@@ -1,15 +1,21 @@
 var fs = require('fs')
 var path = require('path')
 
-var express = require('express')
 var Promise = require("bluebird")
 Promise.promisifyAll(fs)
 
+var express = require('express')
+
+var routes = require('../routes')
+var tabStoreDir = routes.getTabStore.dir
+
 module.exports = {
   start: function (app) {
-    var tabStoreDir = path.join(__dirname, '../tabStore')
+    app.use(routes.testAssets.path, express.static(routes.testAssets.dir))
+    app.use(routes.testBundle.path, express.static(routes.testBundle.dir))
+    app.use(routes.testRemote.path, express.static(routes.testRemote.dir))
 
-    app.get('/tabstore/newest.json', function (req, res) {
+    app.get(routes.getNewestTabStore.path, function (req, res) {
       fs.readdirAsync(tabStoreDir)
         .then(function (names) {
           return names.map(function (name, index) {
@@ -38,7 +44,6 @@ module.exports = {
         .call("sort", function (file1, file2) {
           var mtime1 = +new Date(file1.stat.mtime)
           var mtime2 = +new Date(file2.stat.mtime)
-
           return mtime2 - mtime1
         })
         .then(function (files) {
@@ -54,12 +59,7 @@ module.exports = {
           var content = content.toString('utf-8')
           res.writeHead(200)
           res.end(content)
-
         })
     })
-
-    app.use(express.static(path.join(__dirname, '../testPages/lib')))
-    app.use(express.static(path.join(__dirname, '../../test/remote/build')))
-    app.use(express.static(path.join(__dirname, '../testPages/remote')))
-  },
+  }
 }
