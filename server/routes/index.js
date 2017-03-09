@@ -31,11 +31,11 @@ module.exports = {
   },
 
   testAssets: {
-    path: 'test/assets',
+    path: '/test/assets',
     dir: path.join(__dirname, '../../', 'test/assets')
   },
   testRemote: {
-    path: 'test/remote',
+    path: '/test/remote',
     dir: path.join(__dirname, '../../', 'test/remote')
   },
 }

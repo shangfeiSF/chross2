@@ -56,4 +56,4 @@ setTimeout(function () {
     .then(function (result) {
       window.location.href = 'http://localhost/public/index.html'
     })
-}, 5000)
+}, 500000000)
