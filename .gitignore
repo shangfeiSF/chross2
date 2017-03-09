@@ -1,6 +1,9 @@
 .idea/
-node_modules/
 npm-debug.log
+node_modules/
 _bundle.extension_/
 _bundle.remote_/
 server/tabStore/
+test/remote/components/*/web_modules
+test/remote/web_modules
+test/assets/components/
