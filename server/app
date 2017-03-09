@@ -2,9 +2,9 @@
 'use strict'
 var express = require('express')
 
-var assets = require('./modules/assets')
-var upload = require('./modules/upload')
-var test = require('./modules/test')
+var assets = require('./components/assets')
+var upload = require('./components/upload')
+var test = require('./components/test')
 
 var app = express()
 

@@ -1,15 +1,18 @@
+var Cache = require('cache')
+var Network = require('network')
+
 $.when(
   $.ajax({
     type: 'GET',
-    url: './tabStore.json',
+    url: './mock/tabStore.json',
     dataType: 'json'
   }),
   $.ajax({
     type: 'GET',
-    url: './userTabStore.json',
+    url: './mock/userTabStore.json',
     dataType: 'json'
   })
-  )
+)
   .done(function (data1, data2) {
     // 构造mock数据
     var mockData = {
@@ -20,9 +23,9 @@ $.when(
 
     // 配置测试套件（模块，数据）
     var suite = new Suite({
-      module: window.Network,  // 传入测试模块
+      module: Network,  // 传入测试模块
       dependences: {
-        Cache: window.Cache
+        Cache: Cache
       },
       mockData: mockData  // 传入测试mock数据
     })

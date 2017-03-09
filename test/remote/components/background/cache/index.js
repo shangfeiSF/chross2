@@ -1,15 +1,17 @@
+var Cache = require('cache')
+
 $.when(
   $.ajax({
     type: 'GET',
-    url: './tabStore.json',
+    url: './mock/tabStore.json',
     dataType: 'json'
   }),
   $.ajax({
     type: 'GET',
-    url: './userTabStore.json',
+    url: './mock/userTabStore.json',
     dataType: 'json'
   })
-  )
+)
   .done(function (data1, data2) {
     // 构造mock数据
     var mockData = {
@@ -20,7 +22,7 @@ $.when(
 
     // 配置测试套件（模块，数据）
     var suite = new Suite({
-      module: window.Cache,  // 传入测试模块
+      module: Cache,  // 传入测试模块
       mockData: mockData  // 传入测试mock数据
     })
 
