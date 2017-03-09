@@ -24,19 +24,20 @@ var execAsync = Promise.promisify(child_process.exec, {
 
 var lib = path.join(__dirname, 'lib')
 var files = fs.readdirSync(lib)
+
 var gulpFile = files.filter(function (file) {
   return path.basename(file) === path.basename(__filename) + '.gulp.js'
 }).pop()
 
 var gulpCmd = ['gulp', '--gulpfile', path.join(lib, gulpFile)].concat(params)
+
+var rejected = function (error) {
+  console.log(error.cmd)
+  console.log(error.message)
+}
+
 execAsync(gulpCmd.join(' '), __dirname)
-  .then(
-    function (details) {
-      console.log(details[0])
-      console.log(details[1])
-    },
-    function (error) {
-      console.log(error.cmd)
-      console.log(error.message)
-    }
-  )
+  .then(function (details) {
+    console.log(details[0])
+    console.log(details[1])
+  }, rejected)

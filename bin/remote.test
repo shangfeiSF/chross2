@@ -1,53 +1,47 @@
 #!/usr/bin/env node
-'use strict'
-
+var fs = require('fs')
 var path = require('path')
-var cp = require('child_process')
+var child_process = require('child_process')
 
-var GruntFileName = '_remote.test.gruntfile.js'
-var gruntCommand = [
-  'grunt',
-  '--gruntfile',
-  GruntFileName
-].join(' ')
-
-var webpackFileName = '_remote.test.webpack.js'
-var webpackCommand = [
-  'webpack',
-  '--config',
-  webpackFileName
-].join(' ')
-
-var clean = [
-  'grunt',
-  'clean',
-  '--gruntfile',
-  GruntFileName
-].join(' ')
-
-cp.exec(gruntCommand, {cwd: process.cwd()}, function (error, stdout, stderr) {
-  if (error) {
-    console.error('exec error:' + error)
-  } else {
-    console.log(stdout)
-    console.log(stderr)
-
-    cp.exec(webpackCommand, {cwd: process.cwd()}, function (error, stdout, stderr) {
-      if (error) {
-        console.error('exec error:' + error)
-      } else {
-        console.log(stdout)
-        console.log(stderr)
-
-        cp.exec(clean, {cwd: process.cwd()}, function (error, stdout, stderr) {
-          if (error) {
-            console.error('exec error:' + error)
-          } else {
-            console.log(stdout)
-            console.log(stderr)
-          }
-        })
-      }
-    })
-  }
+var Promise = require('bluebird')
+var execAsync = Promise.promisify(child_process.exec, {
+  context: child_process,
+  multiArgs: true
 })
+
+var lib = path.join(__dirname, 'lib')
+var files = fs.readdirSync(lib)
+
+var gulpFile = files.filter(function (file) {
+  return path.basename(file) === path.basename(__filename) + '.gulp.js'
+}).pop()
+var webpackFile = files.filter(function (file) {
+  return path.basename(file) === path.basename(__filename) + '.webpack.js'
+}).pop()
+
+var gulpCmd = ['gulp', '--gulpfile', path.join(lib, gulpFile)]
+var webpackCmd = ['webpack', '--config', path.join(lib, webpackFile)]
+
+var rejected = function (error) {
+  console.log(error.cmd)
+  console.log(error.message)
+}
+
+execAsync(gulpCmd.join(' '), __dirname)
+  .then(function (details) {
+    console.log(details[0])
+    console.log(details[1])
+
+    return execAsync(webpackCmd.join(' '), __dirname)
+  }, rejected)
+  .then(function (details) {
+    console.log(details[0])
+    console.log(details[1])
+
+    var clean = gulpCmd.concat(['clean'])
+    return execAsync(clean.join(' '), __dirname)
+  }, rejected)
+  .then(function (details) {
+    console.log(details[0])
+    console.log(details[1])
+  }, rejected)

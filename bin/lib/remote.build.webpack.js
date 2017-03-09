@@ -12,9 +12,11 @@ module.exports = {
   entry: (function () {
     var components = path.join(remote, 'components')
     var entry = {}
+
     fs.readdirSync(components).forEach(function (comp) {
       entry[comp] = path.join(components, comp, 'index.js')
     })
+
     return entry
   })(),
 

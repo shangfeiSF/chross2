@@ -3,50 +3,37 @@ var path = require('path')
 
 var webpack = require('webpack')
 
-var config = {
-  sourceDir: './test/remote/src/main',
-  destinationDir: './test/remote/build/main',
-  outputFileName: '[name].bundle.js',
-}
-
-function makeEntry(config) {
-  var sourceDir = config.sourceDir
-  var entry = {}
-
-  fs.readdirSync(sourceDir)
-    .filter(function (file) {
-      return fs.statSync(path.join(sourceDir, file)).isDirectory() && file !== 'web_modules'
-    })
-    .forEach(function (dir) {
-      var dir = dir
-
-      fs.readdirSync(path.join(sourceDir, dir))
-        .forEach(function (file) {
-          if (!fs.statSync(path.join(sourceDir, dir, file)).isDirectory()) {
-            var basename = path.basename(file, '.test.js')
-            var moduleName = path.basename(file, '.js')
-
-            var key = path.join(dir, basename)
-
-            entry[key] = [sourceDir, dir, moduleName].join('/')
-          }
-        })
-    })
-
-  return entry
-}
+var testAssets = path.join(__dirname, '../../test/assets')
+var testRemote = path.join(__dirname, '../../test/remote')
+var components = path.join(testRemote, 'components')
 
 module.exports = {
-  entry: makeEntry(config),
+  devtool: 'inline-source-map',
+
+  entry: (function () {
+    var entry = {}
+
+    fs.readdirSync(components).forEach(function (comp) {
+      fs.readdirSync(path.join(components, comp)).filter(function (module) {
+        var index = fs.readdirSync(path.join(components, comp, module)).filter(function (file) {
+          return file === 'index.js'
+        })
+
+        if (index.length) {
+          entry[path.join(comp, module)] = path.join(components, comp, module, 'index.js')
+        }
+      })
+    })
+
+    return entry
+  })(),
 
   output: {
-    path: config.destinationDir,
-    filename: config.outputFileName,
+    path: path.join(testAssets, 'components'),
+    filename: '[name].bundle.js',
   },
 
-  plugins: [
-    new webpack.ProvidePlugin({
-      $: "jquery"
-    })
-  ]
+  resolve: {
+    modules: ['web_modules', 'node_modules']
+  }
 }

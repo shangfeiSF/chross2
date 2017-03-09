@@ -24,6 +24,7 @@ var execAsync = Promise.promisify(child_process.exec, {
 
 var lib = path.join(__dirname, 'lib')
 var files = fs.readdirSync(lib)
+
 var gulpFile = files.filter(function (file) {
   return path.basename(file) === path.basename(__filename) + '.gulp.js'
 }).pop()
@@ -32,39 +33,28 @@ var webpackFile = files.filter(function (file) {
 }).pop()
 
 var gulpCmd = ['gulp', '--gulpfile', path.join(lib, gulpFile)]
-execAsync(gulpCmd.join(' '), __dirname)
-  .then(
-    function (details) {
-      console.log(details[0])
-      console.log(details[1])
-    },
-    function (error) {
-      console.log(error.cmd)
-      console.log(error.message)
-    }
-  )
-
 var webpackCmd = ['webpack', '--config', path.join(lib, webpackFile)]
-execAsync(webpackCmd.join(' '), __dirname)
-  .then(
-    function (details) {
-      console.log(details[0])
-      console.log(details[1])
 
-      var replaceHost = gulpCmd.concat(['replaceHost']).concat(params)
-      return execAsync(replaceHost.join(' '), __dirname)
-    },
-    function (error) {
-      console.log(error.cmd)
-      console.log(error.message)
-    }
-  ).then(
-  function (details) {
+var rejected = function (error) {
+  console.log(error.cmd)
+  console.log(error.message)
+}
+
+execAsync(gulpCmd.join(' '), __dirname)
+  .then(function (details) {
     console.log(details[0])
     console.log(details[1])
-  },
-  function (error) {
-    console.log(error.cmd)
-    console.log(error.message)
-  }
-)
+  }, rejected)
+
+execAsync(webpackCmd.join(' '), __dirname)
+  .then(function (details) {
+    console.log(details[0])
+    console.log(details[1])
+
+    var replaceHost = gulpCmd.concat(['replaceHost']).concat(params)
+    return execAsync(replaceHost.join(' '), __dirname)
+  }, rejected)
+  .then(function (details) {
+    console.log(details[0])
+    console.log(details[1])
+  }, rejected)
