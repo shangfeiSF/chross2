@@ -5,10 +5,10 @@
     "init": "npm install --registry=https://registry.npm.taobao.org --verbose",
     "extension": "node bin/extension.build --host ",
     "remote": "node bin/remote.build --host ",
-    "test": "node bin/remote.test",
     "watch": "gulp --gulpfile bin/lib/watch.gulp.js --host ",
     "start": "node server/app",
-    "debug": "npm run extension & npm run remote & npm start"
+    "debug": "npm run extension & npm run remote & npm start",
+    "test": "node bin/remote.test -module "
   },
   "description": "Cross Chrome Extensions",
   "dependencies": {
@@ -25,6 +25,7 @@
     "gulp-clean": "^0.3.2",
     "gulp-concat": "^2.6.1",
     "gulp-copy": "^1.0.0",
+    "gulp-open": "^2.0.0",
     "gulp-replace": "^0.5.4",
     "gulp-watch": "^4.3.11",
     "minimist": "^1.2.0",

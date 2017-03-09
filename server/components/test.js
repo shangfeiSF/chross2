@@ -11,6 +11,7 @@ var tabStoreDir = routes.getTabStore.dir
 
 module.exports = {
   start: function (app) {
+    app.use(routes.testBundle.path, express.static(routes.testBundle.dir))
     app.use(routes.testAssets.path, express.static(routes.testAssets.dir))
     app.use(routes.testRemote.path, express.static(routes.testRemote.dir))
 

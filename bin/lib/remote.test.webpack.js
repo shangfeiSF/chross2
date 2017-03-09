@@ -3,15 +3,15 @@ var path = require('path')
 
 var webpack = require('webpack')
 
-var testAssets = path.join(__dirname, '../../test/assets')
+var testBundle = path.join(__dirname, '../../test/_bundle.remote_')
 var testRemote = path.join(__dirname, '../../test/remote')
-var components = path.join(testRemote, 'components')
 
 module.exports = {
   devtool: 'inline-source-map',
 
   entry: (function () {
     var entry = {}
+    var components = path.join(testRemote, 'components')
 
     fs.readdirSync(components).forEach(function (comp) {
       fs.readdirSync(path.join(components, comp)).filter(function (module) {
@@ -29,7 +29,7 @@ module.exports = {
   })(),
 
   output: {
-    path: path.join(testAssets, 'components'),
+    path: path.join(testBundle, 'components'),
     filename: '[name].bundle.js',
   },
 

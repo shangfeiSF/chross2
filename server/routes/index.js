@@ -30,6 +30,10 @@ module.exports = {
     path: '/tabstore/newest.json',
   },
 
+  testBundle: {
+    path: '/test/bundle',
+    dir: path.join(__dirname, '../../', 'test/_bundle.remote_')
+  },
   testAssets: {
     path: '/test/assets',
     dir: path.join(__dirname, '../../', 'test/assets')

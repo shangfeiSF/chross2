@@ -6,4 +6,4 @@ _bundle.remote_/
 server/tabStore/
 test/remote/components/*/web_modules
 test/remote/web_modules
-test/assets/components/
+test/_bundle.remote_/

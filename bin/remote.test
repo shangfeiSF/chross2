@@ -3,7 +3,20 @@ var fs = require('fs')
 var path = require('path')
 var child_process = require('child_process')
 
+var nopt = require('nopt')
 var Promise = require('bluebird')
+
+var knowns = {
+  'module': String
+}
+var shorts = {
+  '-m': ['--module']
+}
+var options = nopt(knowns, shorts, process.argv, 2)
+
+var params = []
+options.module && params.push('--module', options.module)
+
 var execAsync = Promise.promisify(child_process.exec, {
   context: child_process,
   multiArgs: true
@@ -40,6 +53,13 @@ execAsync(gulpCmd.join(' '), __dirname)
 
     var clean = gulpCmd.concat(['clean'])
     return execAsync(clean.join(' '), __dirname)
+  }, rejected)
+  .then(function (details) {
+    console.log(details[0])
+    console.log(details[1])
+
+    var open = gulpCmd.concat(['open']).concat(params)
+    return execAsync(open.join(' '), __dirname)
   }, rejected)
   .then(function (details) {
     console.log(details[0])
