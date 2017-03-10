@@ -11,4 +11,4 @@ suite.fetch(function (error, data) {
 
   this.mock = mock
   this.test()
-})-
+})
