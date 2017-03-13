@@ -1,16 +1,6 @@
-var suit = null
+var moments = require('momentsConfig').moments
 
-var moments = [
-  'onBeforeRequest',
-  'onBeforeSendHeaders',
-  'onSendHeaders',
-  'onHeadersReceived',
-  'onBeforeRedirect',
-  'onResponseStarted',
-  'onCompleted',
-  'onErrorOccurred'
-]
-var specialMoment = 'onAllMoments'
+var suit = null
 
 var expectedInAllViewStores = {
   onBeforeRequest: [true, true, true, true, true],
@@ -33,6 +23,7 @@ var expectedInOneViewStore = {
   onErrorOccurred: false
 }
 
+var specialMoment = 'onAllMoments'
 var specificIndex = 3
 
 var All = function () {

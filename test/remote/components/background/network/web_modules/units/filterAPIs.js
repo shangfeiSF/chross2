@@ -1,20 +1,10 @@
+var moments = require('momentsConfig').moments
+
 var suit = null
 var expected = {}
 
-var moments = [
-  "onBeforeRequest",
-  "onBeforeSendHeaders",
-  "onSendHeaders",
-  "onHeadersReceived",
-  "onBeforeRedirect",
-  "onResponseStarted",
-  "onCompleted",
-  "onErrorOccurred"
-]
-var specialMoment = 'onAllMoments'
-
 var patternURL = 'http://localhost/scripts/1.js'
-
+var specialMoment = 'onAllMoments'
 var specificIndex = 3
 
 var All = function () {
